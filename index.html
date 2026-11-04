@@ -198,7 +198,12 @@ body[data-screen="editor"] #home,body[data-screen="editor"] #pick{display:none}
 .cutbar .ib:disabled{opacity:.35;cursor:default}
 .cutbar .ib svg{width:18px;height:18px}
 .cutdone{flex:none;height:38px;padding:0 14px;border:0;border-radius:12px;background:linear-gradient(180deg,var(--accent-2),var(--accent));color:#fff;font-weight:800;font-size:14px;cursor:pointer}
-.app.cutting .lbtn,.app.cutting .expand,.app.cutting .gesture,.app.cutting .chip-sample,.app.cutting .seltool,.app.cutting .lmenu{display:none}
+.app.cutting .lbtn,.app.cutting .expand,.app.cutting .gesture,.app.cutting .chip-sample,.app.cutting .seltool,.app.cutting .lmenu,.app.cutting .unhide{display:none}
+.czoom,.unhide{position:absolute;bottom:14px;z-index:5;display:inline-flex;align-items:center;gap:7px;height:40px;padding:0 14px 0 11px;border-radius:999px;border:1px solid var(--line-2);background:rgba(18,26,35,.78);color:#fff;font-weight:700;font-size:13px;cursor:pointer;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 10px 24px -12px rgba(0,0,0,.7)}
+.czoom{left:50%;transform:translateX(-50%)}
+.unhide{left:max(14px,env(safe-area-inset-left,0px))}
+.czoom svg,.unhide svg{flex:none;width:18px;height:18px}
+.unhide b{display:grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--accent);font-size:12px}
 .app.cutting .view{cursor:crosshair}
 .busy{position:absolute;left:50%;top:50%;z-index:7;display:flex;align-items:center;gap:12px;max-width:calc(100% - 48px);padding:14px 18px;transform:translate(-50%,-50%);border-radius:18px;background:rgba(18,26,35,.92);border:1px solid var(--line);color:#fff;font-size:14px;box-shadow:0 18px 40px -16px rgba(0,0,0,.8);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 .busy b{font-weight:700}
@@ -483,6 +488,8 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radiu
       <button class="ib" id="cutUndo" type="button" aria-label="Desfazer" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
       <button class="cutdone" id="cutDone" type="button">Pronto</button>
     </div>
+    <button class="czoom" id="cutZoom" type="button" hidden aria-label="Tirar o zoom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M8 11h6"/></svg><span id="cutZoomTxt">2×</span></button>
+    <button class="unhide" id="unhide" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c1-1.5 5-6 10-6s9 4.5 10 6c-1 1.5-5 6-10 6S3 13.5 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span>Mostrar ocultos</span><b id="unhideN">1</b></button>
     <button class="lbtn" id="logoBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="logoMenu" aria-label="Logo">L</button>
     <div class="lmenu" id="logoMenu" role="menu" aria-label="Logo na foto" hidden>
       <span class="lmenu-title">Logo na foto</span>
@@ -515,6 +522,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radiu
         <div class="sec-head"><span class="eyebrow">Atleta na frente</span><button class="link" id="cutClear" type="button" hidden>Apagar recorte</button></div>
         <div class="group">
           <button class="row ind" type="button" id="cutStart"><span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.5 3.5l2 2-9 9-2-2z"/><path d="M9 13c-2.2 0-3.6 1.4-3.6 3.4 0 1.4-.9 2.4-1.9 2.9 3.2 1 7.3.3 7.8-3"/></svg></span><span class="grow"><b id="cutStartTitle">Recorte de atleta</b><small id="cutStartSub">O app acha a pessoa e põe os números atrás</small></span><span class="pill" id="cutStartPill">Recortar</span></button>
+          <div class="row adj" id="cutEdgeRow" hidden><label class="w" for="cutEdge">Borda</label><input type="range" id="cutEdge" min="-4" max="4" step="1" value="0" aria-describedby="cutEdgeOut"><output id="cutEdgeOut" for="cutEdge">Normal</output></div>
           <label class="row toggle" id="cutRow" hidden><span class="grow"><b>Números atrás do atleta</b><small>Logos e patrocinadores ficam na frente</small></span><input class="vh" type="checkbox" id="cutOn"><span class="sw-ui" aria-hidden="true"></span></label>
         </div>
       </div>
@@ -743,7 +751,7 @@ var STYLE_DESC={
   retro:'Mapa de fase de jogo antigo, com um nível a cada quilômetro.'
 };
 
-var S={sport:'corrida',template:'percurso',mapStyle:'linha',pixel:true,showData:true,showLogo:true,quality:'max',cutOn:false,cutErase:false,cutSize:64,logoVar:'full-branco',raceLogo:true,raceSpons:true,raceFrame:true,showExtra:true,extraWhite:false,grad:{on:false,color:'#000000',alpha:80,start:0,end:45},tf:{},hidden:{},sel:null,mapWas:null,format:'story',accent:'#E9B949',darken:20,zoom:100,ox:0,oy:0,
+var S={sport:'corrida',template:'percurso',mapStyle:'linha',pixel:true,showData:true,showLogo:true,quality:'max',cutOn:false,cutErase:false,cutSize:64,cutEdge:0,logoVar:'full-branco',raceLogo:true,raceSpons:true,raceFrame:true,showExtra:true,extraWhite:false,grad:{on:false,color:'#000000',alpha:80,start:0,end:45},tf:{},hidden:{},sel:null,mapWas:null,format:'story',accent:'#E9B949',darken:20,zoom:100,ox:0,oy:0,
   showMap:true,sign:true,guides:true,photo:null,photoSample:true,route:null,routeSample:true,dataSample:true,
   title:'',date:fmtDate(new Date()),dist:'',time:'',elev:'',detail:''};
 assignSample('corrida');
@@ -1210,9 +1218,11 @@ var WIDGETS={linha:wLinha,radar:wRadar,carta:wCarta,metro:wMetro,nav:wNav,retro:
 function drawWidgetAt(ctx,style,r){ctx.save();ctx.translate(r.x,r.y);resetText(ctx);WIDGETS[style](ctx,r.w,r.h);ctx.restore();resetText(ctx);}
 
 /* ---------- overlays drawn on top of the image ---------- */
+var SIGN_LEFT=false;
 function drawSign(ctx,L){
-  resetText(ctx);textShadow(ctx);ctx.font=F.mono(500,22);ls(ctx,4);ctx.fillStyle='rgba(255,255,255,.72)';ctx.textAlign='right';
-  ctx.fillText('FEITO COM PÓDIO',L.W-L.pad,L.top-14);resetText(ctx);
+  var left=SIGN_LEFT&&S.showLogo&&S.showData;
+  resetText(ctx);textShadow(ctx);ctx.font=F.mono(500,22);ls(ctx,4);ctx.fillStyle='rgba(255,255,255,.72)';ctx.textAlign=left?'left':'right';
+  ctx.fillText('FEITO COM PÓDIO',left?L.pad:L.W-L.pad,L.top-14);resetText(ctx);
 }
 function drawGuides(ctx,L){
   resetText(ctx);var top=L.safeTop,bot=L.H-L.safeBottom;
@@ -1571,7 +1581,7 @@ function raceLogoSize(maxW,maxH){var a=imgAspect(raceImg.logo);if(a<1.4)maxH*=1.
 function sponsSize(L){var a=imgAspect(raceImg.spons),w=Math.min(L.W-2*L.pad,(S.format==='story'?120:96)*a);return {w:w,h:w/a};}
 function cornerWidth(){
   var w=0;
-  if(S.showLogo){var a=logoAspect();w+=Math.min(200,(a<1?156:120)*a)+40;}
+  if(S.showLogo)w+=logoBox().w+40;
   if(raceHas('logo'))w+=raceLogoSize(260,120).w+(S.showLogo?28:40);
   return w;
 }
@@ -1592,7 +1602,7 @@ function coBrandItems(L,items,logo,solo){
     rs=raceLogoSize(260,120);var rx,ry;
     if(S.showLogo&&logo){
       rx=corner==='tr'?logo.cx-logo.w/2-28-rs.w/2:logo.cx+logo.w/2+28+rs.w/2;
-      ry=Math.max(logo.cy,L.top-4+rs.h/2);
+      ry=logo.cy-logo.h/2+rs.h/2;
     }else{rx=corner==='tr'?W-pad-rs.w/2:pad+rs.w/2;ry=L.top+10+rs.h/2;}
     items.push({id:'rlogo',kind:'rlogo',cx:rx,cy:ry,w:rs.w,h:rs.h,r:0});
     rowB=Math.max(rowB,ry+rs.h/2);
@@ -1616,13 +1626,23 @@ DRAW.xlogo=function(ctx,it){
   ctx.drawImage(src,0,0,it.w,it.h);noShadow(ctx);
 };
 function drawFrame(ctx,L){if(raceHas('frame'))ctx.drawImage(raceImg[S.format],0,0,L.W,L.H);}
+/* default size of the corner logo: discreet, the athlete can make it bigger with the fingers */
+function logoBox(){
+  var a=logoAspect(),feed=S.format!=='story',h=a<1?(feed?100:108):(feed?60:64),w=h*a;
+  if(w>180){w=180;h=w/a;}return {w:w,h:h};
+}
 function logoAt(L,pos,maxW,maxH){
-  var a=logoAspect();if(a<1)maxH*=1.3;var w=Math.min(maxW,maxH*a),h=w/a,x,y;
-  if(pos==='tr'){x=L.W-L.pad-w/2;y=L.top+10+h/2;}else if(pos==='tl'){x=L.pad+w/2;y=L.top+10+h/2;}else{x=L.W/2;y=L.bottom-h/2;}
+  var a=logoAspect(),w,h,x,y;
+  if(pos==='solo'){if(a<1)maxH*=1.3;w=Math.min(maxW,maxH*a);h=w/a;x=L.W/2;y=L.bottom-h/2;}
+  else{
+    var b=logoBox(),feed=S.format!=='story',side=feed?50:56,top=feed?42:L.top-22;w=b.w;h=b.h;
+    x=pos==='tr'?L.W-side-w/2:side+w/2;y=top+h/2;
+  }
+  if(pos!=='solo')SIGN_LEFT=pos==='tr';
   return {id:'logo',kind:'logo',cx:x,cy:y,w:w,h:h,r:0,pos:pos};
 }
 function layoutDef(L,m,layout,style){
-  var W=L.W,H=L.H,pad=L.pad,story=S.format==='story',hasMap=mapOn(),items=[],bg=null,slot=null,logo=null;
+  var W=L.W,H=L.H,pad=L.pad,story=S.format==='story',hasMap=mapOn(),items=[],bg=null,slot=null,logo=null;SIGN_LEFT=false;
   var tW=W-2*pad-cornerWidth();
   function title(){items.push({id:'title',kind:'title',variant:'top',w:tW,h:130,cx:pad+tW/2,cy:L.top+65,r:0});}
   if(layout==='percurso'){
@@ -1723,6 +1743,7 @@ function render(canvas,guides){
   if(canvas.width!==L.W)canvas.width=L.W;if(canvas.height!==L.H)canvas.height=L.H;
   var ctx=canvas.getContext('2d');ctx.setTransform(1,0,0,1,0,0);resetText(ctx);
   ctx.fillStyle='#0b0c10';ctx.fillRect(0,0,L.W,L.H);
+  if(guides&&cutMode&&CZ.z!==1)ctx.setTransform(CZ.z,0,0,CZ.z,CZ.x,CZ.y);
   drawPhoto(ctx,L,pixelOn(style));resetText(ctx);
   var sc=sceneOf(L,m,S.template,style),sel=null;
   if(sc.bg){sc.bg(ctx);resetText(ctx);}
@@ -1946,7 +1967,7 @@ function captions(){
 
 /* ---------- UI ---------- */
 var raf=0,thumbTimer=0,activeTab='treino';
-function schedule(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;render(cv,true);updateCaptions();updatePill();updateCalc();updateQNote();if(!pointers.size)scheduleThumbs();});}
+function schedule(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;render(cv,true);updateCaptions();updatePill();updateCalc();updateQNote();updateUnhide();if(!pointers.size)scheduleThumbs();});}
 function scheduleThumbs(now){clearTimeout(thumbTimer);thumbTimer=setTimeout(renderThumbs,now?0:180);}
 function renderThumbs(){
   if(screen==='home')renderHome();
@@ -2256,10 +2277,13 @@ function ensureCut(){
   var sc=document.createElement('canvas');sc.width=MW;sc.height=MH;var sx=sc.getContext('2d');sx.drawImage(src,0,0,MW,MH);
   var c=document.createElement('canvas');c.width=MW;c.height=MH;var cx=c.getContext('2d'),img=cx.createImageData(MW,MH),d=img.data;
   for(var i=0;i<d.length;i+=4){d[i]=255;d[i+1]=107;d[i+2]=44;d[i+3]=0;}
-  CUT={src:S.photo,MW:MW,MH:MH,pix:sx.getImageData(0,0,MW,MH).data,img:img,canvas:c,ctx:cx,bbox:null,dirty:true,painted:false,undo:[]};
+  CUT={src:S.photo,MW:MW,MH:MH,pix:sx.getImageData(0,0,MW,MH).data,img:img,canvas:c,ctx:cx,bbox:null,dirty:true,painted:false,undo:[],edit:new Int8Array(MW*MH),auto:null};
   return CUT;
 }
 function cutAlpha(){var d=CUT.img.data,a=new Uint8Array(d.length/4);for(var i=0,j=3;i<a.length;i++,j+=4)a[i]=d[j];return a;}
+/* undo keeps the mask and the strokes (so a new edge setting never loses what was painted) */
+function cutSnap(){return {a:cutAlpha(),e:new Int8Array(CUT.edit),edge:S.cutEdge};}
+function cutPush(){CUT.undo.push(cutSnap());if(CUT.undo.length>8)CUT.undo.shift();}
 function cutReady(){return S.cutOn&&!!CUT&&CUT.src===S.photo&&CUT.painted;}
 function photoRect(L){
   var g=photoGeom(L);if(!g)return null;
@@ -2274,7 +2298,7 @@ function cutBBox(){
 }
 /* one dab of the brush: flood from the centre through pixels close to the centre's colour, so it stops at edges */
 function cutDab(mx,my,r,erase){
-  var C=CUT,W=C.MW,H=C.MH,pix=C.pix,d=C.img.data;
+  var C=CUT,W=C.MW,H=C.MH,pix=C.pix,d=C.img.data,E=C.edit;
   var x0=Math.max(0,Math.floor(mx-r)),x1=Math.min(W-1,Math.ceil(mx+r)),y0=Math.max(0,Math.floor(my-r)),y1=Math.min(H-1,Math.ceil(my+r));
   if(x1<x0||y1<y0)return;
   var cx=clamp(Math.round(mx),x0,x1),cy=clamp(Math.round(my),y0,y1),sr=0,sg=0,sb=0,n=0,i,j,p;
@@ -2287,7 +2311,7 @@ function cutDab(mx,my,r,erase){
     p=(y*W+x)*4;
     if(dd>r2)continue;
     if(dd>core2){var er=pix[p]-sr,eg=pix[p+1]-sg,eb=pix[p+2]-sb;if(er*er+eg*eg+eb*eb>tol2)continue;}
-    d[p+3]=a;
+    d[p+3]=a;E[p>>2]=erase?-1:1;
     if(x>x0&&!seen[(y-y0)*bw+(x-1-x0)]){seen[(y-y0)*bw+(x-1-x0)]=1;q.push(x-1,y);}
     if(x<x1&&!seen[(y-y0)*bw+(x+1-x0)]){seen[(y-y0)*bw+(x+1-x0)]=1;q.push(x+1,y);}
     if(y>y0&&!seen[(y-1-y0)*bw+(x-x0)]){seen[(y-1-y0)*bw+(x-x0)]=1;q.push(x,y-1);}
@@ -2298,7 +2322,7 @@ function cutDab(mx,my,r,erase){
 function cutPoint(pc){
   var L=FORMATS[S.format],pr=photoRect(L);if(!pr||!CUT)return null;
   var X=pc.x+L.W/2,Y=pc.y+L.H/2;
-  return {mx:(X-pr.x)/pr.w*CUT.MW,my:(Y-pr.y)/pr.h*CUT.MH,r:S.cutSize*CUT.MW/pr.w,X:X,Y:Y};
+  return {mx:(X-pr.x)/pr.w*CUT.MW,my:(Y-pr.y)/pr.h*CUT.MH,r:S.cutSize/CZ.z*CUT.MW/pr.w,X:X,Y:Y};
 }
 function cutDraw(pc){
   var m=cutPoint(pc);if(!m)return;var erase=S.cutErase,last=cutStroke.last;
@@ -2309,27 +2333,56 @@ function cutDraw(pc){
   }
   cutStroke.last=m;
 }
+var CZ={z:1,x:0,y:0},cutPtrs=new Map(),cutPinch=null,cutWasCollapsed=false;
+function czClamp(){var L=FORMATS[S.format];CZ.z=clamp(CZ.z,1,8);if(CZ.z<1.02){CZ.z=1;CZ.x=0;CZ.y=0;}CZ.x=clamp(CZ.x,L.W-CZ.z*L.W,0);CZ.y=clamp(CZ.y,L.H-CZ.z*L.H,0);updateCutZoom();}
+function czReset(){CZ.z=1;CZ.x=0;CZ.y=0;cutPinch=null;updateCutZoom();}
+function czAt(f,P){var z0=CZ.z,z=clamp(z0*f,1,8),k=z/z0;CZ.x=P.x-(P.x-CZ.x)*k;CZ.y=P.y-(P.y-CZ.y)*k;CZ.z=z;czClamp();}
+function updateCutZoom(){var b=$('cutZoom');b.hidden=!(cutMode&&CZ.z>1);if(!b.hidden)$('cutZoomTxt').textContent=(Math.round(CZ.z*10)/10).toString().replace('.',',')+'×';}
+function startCutPinch(){
+  var p=Array.from(cutPtrs.values());if(p.length<2){cutPinch=null;return;}
+  var m=mid(p[0],p[1]);cutPinch={d0:Math.max(1,gap(p[0],p[1])),m0:m,z0:CZ.z,X:(m.x-CZ.x)/CZ.z,Y:(m.y-CZ.y)/CZ.z};
+}
 function cutDown(e){
-  e.preventDefault();var pc=toCanvas(e);
-  if(cutStroke){cutStroke=null;return;}                       /* a second finger cancels the stroke */
+  e.preventDefault();try{view.setPointerCapture(e.pointerId);}catch(err){}
+  cutPtrs.set(e.pointerId,rawCanvas(e));
+  if(cutPtrs.size>1){                                           /* a second finger: zoom, and undo a stroke that only just began */
+    if(cutStroke&&CUT&&(Date.now()-cutStroke.t0<450||cutStroke.n<4)&&CUT.undo.length){restoreSnap(CUT.undo.pop());}
+    cutStroke=null;cutCursor=null;startCutPinch();schedule();return;
+  }
   if(!ensureCut())return;
-  CUT.undo.push(cutAlpha());if(CUT.undo.length>8)CUT.undo.shift();
-  try{view.setPointerCapture(e.pointerId);}catch(err){}
-  cutStroke={id:e.pointerId,last:null};cutCursor=pc;cutDraw(pc);updateCutBar();schedule();
+  var pc=toCanvas(e);cutPush();
+  cutStroke={id:e.pointerId,last:null,t0:Date.now(),n:0};cutCursor=pc;cutDraw(pc);updateCutBar();schedule();
 }
 function cutMove(e){
-  var pc=toCanvas(e);cutCursor=pc;
-  if(cutStroke&&e.pointerId===cutStroke.id)cutDraw(pc);
+  if(cutPtrs.has(e.pointerId))cutPtrs.set(e.pointerId,rawCanvas(e));
+  if(cutPinch&&cutPtrs.size>1){
+    var p=Array.from(cutPtrs.values()),m=mid(p[0],p[1]);
+    CZ.z=clamp(cutPinch.z0*gap(p[0],p[1])/cutPinch.d0,1,8);CZ.x=m.x-cutPinch.X*CZ.z;CZ.y=m.y-cutPinch.Y*CZ.z;czClamp();schedule();return;
+  }
+  var pc=toCanvas(e);
+  if(cutStroke&&e.pointerId===cutStroke.id){cutCursor=pc;cutStroke.n++;cutDraw(pc);}
+  else if(e.pointerType==='mouse'&&!cutPtrs.size)cutCursor=pc;
   schedule();
 }
-function cutUp(e){if(cutStroke&&e.pointerId===cutStroke.id)cutStroke=null;if(e.pointerType!=='mouse')cutCursor=null;cutBBox();updateCutBar();schedule();}
+function cutUp(e){
+  cutPtrs.delete(e.pointerId);
+  if(cutStroke&&e.pointerId===cutStroke.id)cutStroke=null;
+  if(cutPtrs.size<2)cutPinch=null;
+  if(e.pointerType!=='mouse')cutCursor=null;cutBBox();updateCutBar();schedule();
+}
+function restoreSnap(sn){
+  var d=CUT.img.data,a=sn.a;for(var i=0,j=3;i<a.length;i++,j+=4)d[j]=a[i];
+  if(sn.e)CUT.edit.set(sn.e);if(sn.edge!=null&&sn.edge!==S.cutEdge){S.cutEdge=sn.edge;syncCutEdge();}
+  CUT.ctx.putImageData(CUT.img,0,0);CUT.dirty=true;cutBBox();
+}
 function drawCutOverlay(ctx,L){
   var pr=photoRect(L);
   if(CUT&&pr){ctx.save();ctx.globalAlpha=.5;ctx.imageSmoothingEnabled=true;ctx.drawImage(CUT.canvas,pr.x,pr.y,pr.w,pr.h);ctx.restore();}
   if(cutCursor){
     var X=cutCursor.x+L.W/2,Y=cutCursor.y+L.H/2;
-    ctx.save();ctx.lineWidth=4;ctx.strokeStyle='rgba(0,0,0,.55)';ctx.beginPath();ctx.arc(X,Y,S.cutSize,0,Math.PI*2);ctx.stroke();
-    ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.setLineDash(S.cutErase?[8,6]:[]);ctx.beginPath();ctx.arc(X,Y,S.cutSize,0,Math.PI*2);ctx.stroke();ctx.restore();
+    var R=S.cutSize/CZ.z,u=1/CZ.z;
+    ctx.save();ctx.lineWidth=4*u;ctx.strokeStyle='rgba(0,0,0,.55)';ctx.beginPath();ctx.arc(X,Y,R,0,Math.PI*2);ctx.stroke();
+    ctx.lineWidth=2*u;ctx.strokeStyle='#fff';ctx.setLineDash(S.cutErase?[8*u,6*u]:[]);ctx.beginPath();ctx.arc(X,Y,R,0,Math.PI*2);ctx.stroke();ctx.restore();
   }
 }
 /* the person, cut from the finished background, drawn back over the layout */
@@ -2361,7 +2414,7 @@ function drawScene(ctx,L,sc,pixel,k,drawOne,live){
 function updateCutBar(){
   var has=!!(CUT&&CUT.src===S.photo&&(CUT.dirty?cutBBox():CUT.bbox));
   $('cutUndo').disabled=!(CUT&&CUT.undo.length);
-  $('cutRow').hidden=!has;$('cutClear').hidden=!has;$('cutOn').checked=S.cutOn&&has;
+  $('cutRow').hidden=!has;$('cutClear').hidden=!has;$('cutOn').checked=S.cutOn&&has;$('cutEdgeRow').hidden=!(has&&CUT.auto);
   $('cutStartTitle').textContent='Recorte de atleta';
   $('cutStartPill').textContent=has?'Ajustar':'Recortar';
   $('cutStartSub').textContent=has?'Corrija a borda com o pincel, se precisar':'O app acha a pessoa e põe os números atrás';
@@ -2369,20 +2422,34 @@ function updateCutBar(){
 function enterCut(msg){
   if(!S.photo||!ensureCut())return;
   cutMode=true;S.sel=null;updateSelTool();closeLogoMenu();
+  cutWasCollapsed=$('app').classList.contains('collapsed');
   $('app').classList.add('cutting','collapsed');$('cutBar').hidden=false;updateExpand();updateCutBar();
-  toast(typeof msg==='string'?msg:'Pinte a pessoa com o dedo. O pincel para nas bordas.');schedule();
+  czReset();updateCutZoom();
+  toast(typeof msg==='string'?msg:'Pinte ou apague com um dedo. Dois dedos dão zoom.');schedule();
 }
 function exitCut(){
-  cutMode=false;cutStroke=null;cutCursor=null;$('app').classList.remove('cutting');$('cutBar').hidden=true;
+  cutMode=false;cutStroke=null;cutCursor=null;cutPtrs.clear();czReset();$('app').classList.remove('cutting');$('cutBar').hidden=true;
+  if(!cutWasCollapsed){$('app').classList.remove('collapsed');updateExpand();}
   cutBBox();if(CUT&&CUT.painted)S.cutOn=true;
   updateCutBar();schedule();scheduleThumbs(true);
   if(S.cutOn&&CUT&&CUT.painted)toast('Pronto. Os números ficam atrás do atleta.');
 }
-function resetCut(){CUT=null;S.cutOn=false;if(cutMode)exitCut();updateCutBar();}
+function resetCut(){CUT=null;S.cutOn=false;S.cutEdge=0;syncCutEdge();if(cutMode)exitCut();updateCutBar();}
+var EDGE_NAMES={'-4':'Bem justa','-3':'Mais justa','-2':'Justa','-1':'Um pouco justa','0':'Normal','1':'Um pouco solta','2':'Solta','3':'Mais solta','4':'Bem solta'};
+function syncCutEdge(){var r=$('cutEdge');r.value=S.cutEdge;setRange(r);$('cutEdgeOut').textContent=EDGE_NAMES[S.cutEdge]||'Normal';}
+var edgeRaf=0;
+$('cutEdge').addEventListener('input',function(){
+  var v=+this.value;if(v===S.cutEdge){syncCutEdge();return;}
+  if(!CUT||!CUT.auto)return;
+  if(!edgeRaf)cutPush();S.cutEdge=v;syncCutEdge();
+  cancelAnimationFrame(edgeRaf);edgeRaf=requestAnimationFrame(function(){applyAuto(CUT);updateCutBar();schedule();scheduleThumbs(true);});
+});
+$('cutEdge').addEventListener('change',function(){edgeRaf=0;});
+$('cutZoom').addEventListener('click',function(){czReset();schedule();});
 $('cutStart').addEventListener('click',function(){var has=!!(CUT&&CUT.src===S.photo&&CUT.painted);if(has)enterCut();else autoCut();});
 $('cutDone').addEventListener('click',exitCut);
 $('cutUndo').addEventListener('click',function(){
-  if(!CUT||!CUT.undo.length)return;var ua=CUT.undo.pop(),ud=CUT.img.data;for(var ui=0,uj=3;ui<ua.length;ui++,uj+=4)ud[uj]=ua[ui];CUT.ctx.putImageData(CUT.img,0,0);CUT.dirty=true;cutBBox();updateCutBar();schedule();
+  if(!CUT||!CUT.undo.length)return;restoreSnap(CUT.undo.pop());updateCutBar();schedule();
 });
 $('cutClear').addEventListener('click',function(){resetCut();schedule();scheduleThumbs(true);toast('Recorte apagado');});
 $('cutOn').addEventListener('change',function(){S.cutOn=this.checked;schedule();scheduleThumbs(true);});
@@ -2396,6 +2463,7 @@ var SEG_MODELS={
   head:'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite'
 };
 var SEGMENTERS={},segLoading=null,autoBusy=false;
+var CUTP={eps:0.0004,rad:110,t0:0.45,tw:0.2,step:0.055,keep:0.3,hole:0.0015};
 function withTimeout(p,ms){return new Promise(function(res,rej){var t=setTimeout(function(){rej(new Error('timeout'));},ms);p.then(function(v){clearTimeout(t);res(v);},function(e){clearTimeout(t);rej(e);});});}
 function loadSeg(){
   if(window.PODIO_SEG_MOCK)return Promise.resolve({body:{mock:'body'},head:{mock:'head'}});
@@ -2472,6 +2540,51 @@ function guidedFilterRGB(R,G,B,p,w,h,r,eps){
   for(i=0;i<n;i++)q[i]=qa[i]*R[i]+qg[i]*G[i]+qb[i]*B[i]+q0[i];
   return q;
 }
+/* soft map -> mask: the edge setting moves the threshold; only the main athlete stays; small holes are filled */
+function applyAuto(C){
+  var A=C.auto,W=C.MW,d=C.img.data,E=C.edit,w=A.rw,h=A.rh,n=w*h,al=new Uint8Array(n),i,x,y;
+  var t0=CUTP.t0-S.cutEdge*CUTP.step,tw=CUTP.tw;
+  for(i=0;i<n;i++){var t=(A.q[i]-t0)/tw;t=t<0?0:t>1?1:t;al[i]=Math.round(t*t*(3-2*t)*255);}
+  var area=keepMain(al,w,h);fillHoles(al,w,h,area);
+  for(i=3;i<d.length;i+=4)d[i]=0;
+  var any=false;
+  for(y=0;y<h;y++){var o=(A.ry+y)*W+A.rx,r=y*w;for(x=0;x<w;x++){var v=al[r+x];if(v){d[(o+x)*4+3]=v;any=true;}}}
+  for(i=0;i<E.length;i++)if(E[i]){d[i*4+3]=E[i]>0?255:0;any=true;}        /* what the athlete painted or erased wins */
+  C.ctx.putImageData(C.img,0,0);C.dirty=true;cutBBox();
+  return any;
+}
+/* connected pieces of the mask: the biggest one is the athlete; others survive only if they are big too (a second athlete) */
+function keepMain(al,w,h){
+  var n=w*h,lab=new Int32Array(n),st=new Int32Array(n),areas=[0],i,k;
+  for(i=0;i<n;i++){
+    if(!al[i]||lab[i])continue;
+    var id=areas.length,top=0,a=0;lab[i]=id;st[top++]=i;
+    while(top){var q=st[--top],qx=q%w,qy=(q-qx)/w;if(al[q]>=128)a++;
+      for(var dy=-1;dy<=1;dy++){var yy=qy+dy;if(yy<0||yy>=h)continue;for(var dx=-1;dx<=1;dx++){var xx=qx+dx;if(xx<0||xx>=w)continue;k=yy*w+xx;if(al[k]&&!lab[k]){lab[k]=id;st[top++]=k;}}}}
+    areas.push(a);
+  }
+  var big=0;for(i=1;i<areas.length;i++)if(areas[i]>big)big=areas[i];
+  if(!big)return 0;
+  var keep=new Uint8Array(areas.length),tot=0;for(i=1;i<areas.length;i++)if(areas[i]>=big*CUTP.keep){keep[i]=1;tot+=areas[i];}
+  for(i=0;i<n;i++)if(lab[i]&&!keep[lab[i]])al[i]=0;
+  return tot;
+}
+/* background pieces that do not reach the border are holes; the small ones get filled */
+function fillHoles(al,w,h,area){
+  if(!area)return;
+  var n=w*h,lab=new Int32Array(n),st=new Int32Array(n),lim=Math.max(24,area*CUTP.hole),i;
+  for(i=0;i<n;i++){
+    if(al[i]>=128||lab[i])continue;
+    var top=0,cnt=0,edge=false,list=[];lab[i]=1;st[top++]=i;
+    while(top){var q=st[--top],qx=q%w,qy=(q-qx)/w;cnt++;if(cnt<=lim)list.push(q);
+      if(qx===0||qy===0||qx===w-1||qy===h-1)edge=true;
+      if(qx>0&&al[q-1]<128&&!lab[q-1]){lab[q-1]=1;st[top++]=q-1;}
+      if(qx<w-1&&al[q+1]<128&&!lab[q+1]){lab[q+1]=1;st[top++]=q+1;}
+      if(qy>0&&al[q-w]<128&&!lab[q-w]){lab[q-w]=1;st[top++]=q-w;}
+      if(qy<h-1&&al[q+w]<128&&!lab[q+w]){lab[q+w]=1;st[top++]=q+w;}}
+    if(!edge&&cnt<=lim)for(var j=0;j<list.length;j++)al[list[j]]=255;
+  }
+}
 function setBusy(t){var b=$('busy');if(t){$('busyText').textContent=t;b.hidden=false;}else b.hidden=true;}
 function clampRect(x0,y0,x1,y1,W,H){return [Math.max(0,x0),Math.max(0,y0),Math.min(W,x1),Math.min(H,y1)];}
 function autoCut(){
@@ -2523,16 +2636,10 @@ function autoCut(){
     /* 4 · refine the edge with the photo's colours, then tighten it so the background never covers the numbers */
     var Rr=new Float32Array(rw*rh),Gg=new Float32Array(rw*rh),Bb=new Float32Array(rw*rh),pix=C.pix,d=C.img.data;
     for(y=0;y<rh;y++)for(x=0;x<rw;x++){var q=((ry+y)*W+rx+x)*4,k2=y*rw+x;Rr[k2]=pix[q]/255;Gg[k2]=pix[q+1]/255;Bb[k2]=pix[q+2]/255;}
-    var rad=Math.max(2,Math.round(Math.max(rw,rh)/110)),gq=guidedFilterRGB(Rr,Gg,Bb,P,rw,rh,rad,0.0006);
-    C.undo.push(cutAlpha());if(C.undo.length>8)C.undo.shift();
-    for(i=3;i<d.length;i+=4)d[i]=0;
-    var any=false;
-    for(y=0;y<rh;y++)for(x=0;x<rw;x++){
-      var v=gq[y*rw+x],tt=Math.max(0,Math.min(1,(v-0.45)/0.2)),al=Math.round(tt*tt*(3-2*tt)*255);
-      if(al>0){d[((ry+y)*W+rx+x)*4+3]=al;any=true;}
-    }
-    C.ctx.putImageData(C.img,0,0);C.dirty=true;cutBBox();
-    return any?'ok':'none';
+    var gq=guidedFilterRGB(Rr,Gg,Bb,P,rw,rh,Math.max(2,Math.round(Math.max(rw,rh)/CUTP.rad)),CUTP.eps);
+    cutPush();C.edit.fill(0);S.cutEdge=0;syncCutEdge();
+    C.auto={rx:rx,ry:ry,rw:rw,rh:rh,q:gq};
+    return applyAuto(C)?'ok':'none';
   }).then(function(r){
     autoBusy=false;$('cutStart').disabled=false;setBusy(null);
     if(r==='ok'){S.cutOn=true;updateCutBar();schedule();scheduleThumbs(true);toast('Atleta recortado. Os números ficam atrás.');}
@@ -2611,9 +2718,14 @@ $('gpxIn').addEventListener('change',function(){
 
 /* ---------- gestures: stickers move, scale and rotate; elsewhere the photo moves and zooms ---------- */
 var view=$('view'),gestItem=null,gestPre='',wheelTimer=0;
-function toCanvas(e){
+function rawCanvas(e){
   var r=cv.getBoundingClientRect(),L=FORMATS[S.format];
-  return {x:(e.clientX-r.left)*L.W/r.width-L.W/2,y:(e.clientY-r.top)*L.H/r.height-L.H/2};
+  return {x:(e.clientX-r.left)*L.W/r.width,y:(e.clientY-r.top)*L.H/r.height};
+}
+function toCanvas(e){
+  var P=rawCanvas(e),L=FORMATS[S.format];
+  if(cutMode&&CZ.z!==1){P.x=(P.x-CZ.x)/CZ.z;P.y=(P.y-CZ.y)/CZ.z;}
+  return {x:P.x-L.W/2,y:P.y-L.H/2};
 }
 function gap(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
 function mid(a,b){return {x:(a.x+b.x)/2,y:(a.y+b.y)/2};}
@@ -2720,7 +2832,7 @@ function endPointer(e){
 view.addEventListener('pointerup',endPointer);view.addEventListener('pointercancel',endPointer);
 view.addEventListener('wheel',function(e){
   if(e.target.closest('.lmenu,.seltool,.cutbar'))return;
-  if(cutMode){e.preventDefault();var cs=$('cutSize');S.cutSize=clamp(S.cutSize*Math.exp(-(e.deltaY||e.deltaX)*0.002),12,140);cs.value=Math.round(S.cutSize);setRange(cs);cutCursor=toCanvas(e);schedule();return;}
+  if(cutMode){e.preventDefault();czAt(Math.exp(-(e.deltaY||e.deltaX)*(e.ctrlKey?0.01:0.002)),rawCanvas(e));cutCursor=toCanvas(e);schedule();return;}
   var pc=toCanvas(e),h=(!pointers.size&&activeTab!=='foto')?hitItem(pc):null,dy=e.deltaY||e.deltaX;
   if(h){
     e.preventDefault();hideHint();var t=ensureTf(h.it,h.pre);S.sel=h.it.id;updateSelTool();
@@ -2756,13 +2868,17 @@ document.querySelectorAll('#selTool [data-act]').forEach(function(b){
   b.addEventListener('click',function(){
     var c=curItem();if(!c)return;var act=b.getAttribute('data-act'),k=c.pre+c.it.id,t;
     if(act==='hide'){
-      if(c.it.kind==='map'){S.showMap=false;$('showMap').checked=false;}
-      else if(c.it.kind==='logo'){S.showLogo=false;$('showLogo').checked=false;updateLogoBtn();}
-      else if(c.it.kind==='rlogo'){S.raceLogo=false;syncRaceUI();}
-      else if(c.it.kind==='spons'){S.raceSpons=false;syncRaceUI();}
-      else if(c.it.kind==='xlogo'){S.showExtra=false;$('extraOn').checked=false;}
+      var kd=c.it.kind;
+      if(kd==='map'){S.showMap=false;$('showMap').checked=false;}
+      else if(kd==='logo'){S.showLogo=false;$('showLogo').checked=false;updateLogoBtn();}
+      else if(kd==='rlogo'){S.raceLogo=false;syncRaceUI();}
+      else if(kd==='spons'){S.raceSpons=false;syncRaceUI();}
+      else if(kd==='xlogo'){S.showExtra=false;$('extraOn').checked=false;}
       else S.hidden[k]=true;
-      S.sel=null;updateSelTool();schedule();return;
+      if(EYE_KINDS[kd]&&eyeOff.indexOf(kd)<0)eyeOff.push(kd);
+      S.sel=null;updateSelTool();schedule();scheduleThumbs();
+      toast('Escondido. Toque em “Mostrar ocultos” para trazer de volta.');
+      return;
     }
     if(act==='reset'){delete S.tf[k];schedule();return;}
     t=ensureTf(c.it,c.pre);
@@ -2771,6 +2887,27 @@ document.querySelectorAll('#selTool [data-act]').forEach(function(b){
   });
 });
 $('selClose').addEventListener('click',function(){S.sel=null;updateSelTool();schedule();});
+/* things hidden with the eye: listed so one tap brings them all back */
+var EYE_KINDS={map:1,logo:1,rlogo:1,spons:1,xlogo:1},eyeOff=[];
+function eyeIsOff(k){return k==='map'?!S.showMap:k==='logo'?!S.showLogo:k==='rlogo'?!S.raceLogo:k==='spons'?!S.raceSpons:k==='xlogo'?!S.showExtra:false;}
+function hiddenKeys(){var pre=(S.showData?S.template:'solo')+':';return Object.keys(S.hidden).filter(function(k){return S.hidden[k]&&k.indexOf(pre)===0;});}
+function updateUnhide(){
+  eyeOff=eyeOff.filter(eyeIsOff);
+  var n=hiddenKeys().length+eyeOff.length,b=$('unhide');
+  if(b.hidden!==!n)b.hidden=!n;if(n)$('unhideN').textContent=n;
+}
+$('unhide').addEventListener('click',function(){
+  hiddenKeys().forEach(function(k){delete S.hidden[k];});
+  eyeOff.forEach(function(k){
+    if(k==='map'){S.showMap=true;$('showMap').checked=true;}
+    else if(k==='logo'){S.showLogo=true;}
+    else if(k==='rlogo')S.raceLogo=true;
+    else if(k==='spons')S.raceSpons=true;
+    else if(k==='xlogo'){S.showExtra=true;$('extraOn').checked=true;}
+  });
+  eyeOff=[];if(typeof syncRaceUI==='function')syncRaceUI();updateLogoBtn();updateUnhide();schedule();scheduleThumbs(true);
+  toast('Itens de volta na foto');
+});
 
 /* logo button */
 function logoMode(){return !S.showLogo?'off':S.showData?'dados':'so';}

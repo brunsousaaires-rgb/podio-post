@@ -15,9 +15,10 @@ Atletas de corrida, ciclismo, HYROX e CrossFit. Organizadores de corridas são p
 - Números do treino: distância, tempo, ritmo, elevação e data (preenchidos pelo GPX ou à mão).
 - Todos os itens podem ser movidos, aumentados e girados com os dedos.
 - Foto: zoom, escurecer, degradê de baixo para cima (cor, intensidade, início e fim).
-- Recorte de atleta: números e mapa atrás da pessoa, logos na frente.
+- Recorte de atleta automático (MediaPipe no próprio aparelho): números e mapa atrás da pessoa, logos na frente. Ajuste da borda (mais justa ou mais solta), pincel e borracha com zoom de dois dedos.
 - Imagem salva na resolução da foto original (até ~16 MP) ou leve (1080 px).
-- Logo padrão do fotógrafo Bruno Aires em 4 versões; logo extra liberada por código de acesso.
+- Logo padrão do fotógrafo Bruno Aires em 4 versões, pequena e discreta no canto; logo extra liberada por código de acesso.
+- Itens escondidos pelo olho voltam pelo botão “Mostrar ocultos”.
 - Pacote da corrida: logo da corrida, faixa de patrocinadores, moldura oficial (story e feed), nome, data, distâncias, cor, hashtag e @ nas legendas.
 - Cada corrida tem link próprio (/c/nome-da-corrida) e pode aparecer na lista de corridas parceiras.
 - Legendas prontas, sugestões de música e dicas de pose.
@@ -37,6 +38,5 @@ Atletas de corrida, ciclismo, HYROX e CrossFit. Organizadores de corridas são p
 - `vercel.json` — rotas (`/c/:id`) e cabeçalhos
 
 ## Próximos passos
-- Recorte automático do atleta com inteligência artificial no próprio aparelho.
 - Story animado (vídeo curto).
 - Fotos da prova dentro do app, buscadas pelo número de peito.
