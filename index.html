@@ -200,6 +200,11 @@ body[data-screen="editor"] #home,body[data-screen="editor"] #pick{display:none}
 .cutdone{flex:none;height:38px;padding:0 14px;border:0;border-radius:12px;background:linear-gradient(180deg,var(--accent-2),var(--accent));color:#fff;font-weight:800;font-size:14px;cursor:pointer}
 .app.cutting .lbtn,.app.cutting .expand,.app.cutting .gesture,.app.cutting .chip-sample,.app.cutting .seltool,.app.cutting .lmenu{display:none}
 .app.cutting .view{cursor:crosshair}
+.busy{position:absolute;left:50%;top:50%;z-index:7;display:flex;align-items:center;gap:12px;max-width:calc(100% - 48px);padding:14px 18px;transform:translate(-50%,-50%);border-radius:18px;background:rgba(18,26,35,.92);border:1px solid var(--line);color:#fff;font-size:14px;box-shadow:0 18px 40px -16px rgba(0,0,0,.8);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.busy b{font-weight:700}
+.spin{flex:none;width:22px;height:22px;border-radius:50%;border:3px solid rgba(255,255,255,.2);border-top-color:var(--accent);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+button.row:disabled{opacity:.6;cursor:progress}
 .dims{display:none;position:absolute;left:max(20px,env(safe-area-inset-left,0px));bottom:16px;color:var(--muted);font-weight:600;font-size:12px;pointer-events:none}
 
 /* ---------- tool sheet ---------- */
@@ -468,6 +473,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radiu
       <button type="button" data-act="hide" aria-label="Ocultar da foto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c5 0 9 4.5 10 6-.4.6-1.3 1.8-2.6 3M6.6 6.6C4.4 8 2.8 10.2 2 12c1 1.5 5 6 10 6 1.6 0 3-.4 4.3-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button>
       <button type="button" id="selClose" aria-label="Fechar seleção"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
+    <div class="busy" id="busy" role="status" aria-live="polite" hidden><span class="spin" aria-hidden="true"></span><b id="busyText">Recortando o atleta…</b></div>
     <div class="cutbar" id="cutBar" role="toolbar" aria-label="Pincel do recorte" hidden>
       <div class="segmented" role="radiogroup" aria-label="Ferramenta">
         <label><input class="vh" type="radio" name="cutTool" id="cutPaint" value="paint" checked><span>Pintar</span></label>
@@ -508,7 +514,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radiu
       <div class="sec" id="cutSec">
         <div class="sec-head"><span class="eyebrow">Atleta na frente</span><button class="link" id="cutClear" type="button" hidden>Apagar recorte</button></div>
         <div class="group">
-          <button class="row ind" type="button" id="cutStart"><span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.5 3.5l2 2-9 9-2-2z"/><path d="M9 13c-2.2 0-3.6 1.4-3.6 3.4 0 1.4-.9 2.4-1.9 2.9 3.2 1 7.3.3 7.8-3"/></svg></span><span class="grow"><b id="cutStartTitle">Recorte de atleta</b><small>Os números e o mapa ficam atrás da pessoa</small></span><span class="pill" id="cutStartPill">Recortar</span></button>
+          <button class="row ind" type="button" id="cutStart"><span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.5 3.5l2 2-9 9-2-2z"/><path d="M9 13c-2.2 0-3.6 1.4-3.6 3.4 0 1.4-.9 2.4-1.9 2.9 3.2 1 7.3.3 7.8-3"/></svg></span><span class="grow"><b id="cutStartTitle">Recorte de atleta</b><small id="cutStartSub">O app acha a pessoa e põe os números atrás</small></span><span class="pill" id="cutStartPill">Recortar</span></button>
           <label class="row toggle" id="cutRow" hidden><span class="grow"><b>Números atrás do atleta</b><small>Logos e patrocinadores ficam na frente</small></span><input class="vh" type="checkbox" id="cutOn"><span class="sw-ui" aria-hidden="true"></span></label>
         </div>
       </div>
@@ -2245,7 +2251,7 @@ var FRONT={logo:1,rlogo:1,xlogo:1,spons:1};
 function ensureCut(){
   if(CUT&&CUT.src===S.photo)return CUT;
   var src=photoSrc();if(!src)return null;
-  var iw=src.naturalWidth||src.width,ih=src.naturalHeight||src.height,k=Math.min(1,1024/Math.max(iw,ih));
+  var iw=src.naturalWidth||src.width,ih=src.naturalHeight||src.height,k=Math.min(1,1280/Math.max(iw,ih));
   var MW=Math.max(1,Math.round(iw*k)),MH=Math.max(1,Math.round(ih*k));
   var sc=document.createElement('canvas');sc.width=MW;sc.height=MH;var sx=sc.getContext('2d');sx.drawImage(src,0,0,MW,MH);
   var c=document.createElement('canvas');c.width=MW;c.height=MH;var cx=c.getContext('2d'),img=cx.createImageData(MW,MH),d=img.data;
@@ -2357,12 +2363,13 @@ function updateCutBar(){
   $('cutRow').hidden=!has;$('cutClear').hidden=!has;$('cutOn').checked=S.cutOn&&has;
   $('cutStartTitle').textContent='Recorte de atleta';
   $('cutStartPill').textContent=has?'Ajustar':'Recortar';
+  $('cutStartSub').textContent=has?'Corrija a borda com o pincel, se precisar':'O app acha a pessoa e põe os números atrás';
 }
-function enterCut(){
+function enterCut(msg){
   if(!S.photo||!ensureCut())return;
   cutMode=true;S.sel=null;updateSelTool();closeLogoMenu();
   $('app').classList.add('cutting','collapsed');$('cutBar').hidden=false;updateExpand();updateCutBar();
-  toast('Pinte a pessoa com o dedo. O pincel para nas bordas.');schedule();
+  toast(typeof msg==='string'?msg:'Pinte a pessoa com o dedo. O pincel para nas bordas.');schedule();
 }
 function exitCut(){
   cutMode=false;cutStroke=null;cutCursor=null;$('app').classList.remove('cutting');$('cutBar').hidden=true;
@@ -2371,7 +2378,7 @@ function exitCut(){
   if(S.cutOn&&CUT&&CUT.painted)toast('Pronto. Os números ficam atrás do atleta.');
 }
 function resetCut(){CUT=null;S.cutOn=false;if(cutMode)exitCut();updateCutBar();}
-$('cutStart').addEventListener('click',enterCut);
+$('cutStart').addEventListener('click',function(){var has=!!(CUT&&CUT.src===S.photo&&CUT.painted);if(has)enterCut();else autoCut();});
 $('cutDone').addEventListener('click',exitCut);
 $('cutUndo').addEventListener('click',function(){
   if(!CUT||!CUT.undo.length)return;CUT.img.data.set(CUT.undo.pop());CUT.ctx.putImageData(CUT.img,0,0);CUT.dirty=true;cutBBox();updateCutBar();schedule();
@@ -2380,6 +2387,109 @@ $('cutClear').addEventListener('click',function(){resetCut();schedule();schedule
 $('cutOn').addEventListener('change',function(){S.cutOn=this.checked;schedule();scheduleThumbs(true);});
 document.querySelectorAll('input[name="cutTool"]').forEach(function(r){r.addEventListener('change',function(){S.cutErase=r.value==='erase';schedule();});});
 $('cutSize').addEventListener('input',function(){S.cutSize=+this.value;setRange(this);if(!cutCursor){var L=FORMATS[S.format];cutCursor={x:0,y:0};}schedule();});
+
+/* ---------- automatic athlete cut-out: MediaPipe person segmentation on the device, edges refined with the photo ---------- */
+var MP_BASE='https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+var SEG_MODEL='https://storage.googleapis.com/mediapipe-models/image_segmenter/deeplab_v3/float32/1/deeplab_v3.tflite';
+var SEGMENTER=null,segLoading=null,autoBusy=false;
+function withTimeout(p,ms){return new Promise(function(res,rej){var t=setTimeout(function(){rej(new Error('timeout'));},ms);p.then(function(v){clearTimeout(t);res(v);},function(e){clearTimeout(t);rej(e);});});}
+function loadSeg(){
+  if(window.PODIO_SEG_MOCK)return Promise.resolve({mock:window.PODIO_SEG_MOCK});
+  if(SEGMENTER)return Promise.resolve(SEGMENTER);
+  if(segLoading)return segLoading;
+  segLoading=withTimeout(import(MP_BASE+'/vision_bundle.mjs').then(function(v){
+    return v.FilesetResolver.forVisionTasks(MP_BASE+'/wasm').then(function(files){
+      var make=function(delegate){return v.ImageSegmenter.createFromOptions(files,{baseOptions:{modelAssetPath:SEG_MODEL,delegate:delegate},runningMode:'IMAGE',outputCategoryMask:false,outputConfidenceMasks:true});};
+      return make('GPU').catch(function(){return make('CPU');});
+    });
+  }),60000).then(function(s){SEGMENTER=s;return s;},function(e){segLoading=null;throw e;});
+  return segLoading;
+}
+/* person probability for an image (canvas); deeplab class 15 is "person" */
+function segPerson(seg,canvas){
+  if(seg.mock)return seg.mock(canvas);
+  var res=seg.segment(canvas),ms=res.confidenceMasks||[],m=ms[15]||ms[ms.length-1];
+  if(!m){if(res.close)res.close();throw new Error('no mask');}
+  var out={w:m.width,h:m.height,a:new Float32Array(m.getAsFloat32Array())};
+  if(res.close)res.close();else ms.forEach(function(x){if(x.close)x.close();});
+  return out;
+}
+function canvasOf(src,sx,sy,sw,sh,maxSide){
+  var k=Math.min(1,maxSide/Math.max(sw,sh)),c=document.createElement('canvas');
+  c.width=Math.max(1,Math.round(sw*k));c.height=Math.max(1,Math.round(sh*k));
+  var g=c.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(src,sx,sy,sw,sh,0,0,c.width,c.height);return c;
+}
+/* resample a probability map to w x h (bilinear, via canvas) */
+function resampleProb(p,w,h){
+  var c=document.createElement('canvas');c.width=p.w;c.height=p.h;var g=c.getContext('2d'),img=g.createImageData(p.w,p.h),d=img.data;
+  for(var i=0;i<p.a.length;i++){var v=Math.max(0,Math.min(255,Math.round(p.a[i]*255)));d[i*4]=v;d[i*4+1]=v;d[i*4+2]=v;d[i*4+3]=255;}
+  g.putImageData(img,0,0);
+  var o=document.createElement('canvas');o.width=w;o.height=h;var og=o.getContext('2d');og.imageSmoothingEnabled=true;og.imageSmoothingQuality='high';og.drawImage(c,0,0,w,h);
+  var od=og.getImageData(0,0,w,h).data,out=new Float32Array(w*h);for(i=0;i<out.length;i++)out[i]=od[i*4]/255;return out;
+}
+/* box mean with an integral image (O(n)) */
+function boxMean(src,w,h,r){
+  var S=new Float64Array((w+1)*(h+1)),x,y,out=new Float32Array(w*h);
+  for(y=0;y<h;y++){var row=0;for(x=0;x<w;x++){row+=src[y*w+x];S[(y+1)*(w+1)+x+1]=S[y*(w+1)+x+1]+row;}}
+  for(y=0;y<h;y++){var y0=Math.max(0,y-r),y1=Math.min(h,y+r+1);for(x=0;x<w;x++){var x0=Math.max(0,x-r),x1=Math.min(w,x+r+1);
+    out[y*w+x]=(S[y1*(w+1)+x1]-S[y0*(w+1)+x1]-S[y1*(w+1)+x0]+S[y0*(w+1)+x0])/((y1-y0)*(x1-x0));}}
+  return out;
+}
+/* guided filter (He et al.): moves the soft mask's edge onto the photo's real edges */
+function guidedFilter(I,p,w,h,r,eps){
+  var n=w*h,Ip=new Float32Array(n),II=new Float32Array(n),i;
+  for(i=0;i<n;i++){Ip[i]=I[i]*p[i];II[i]=I[i]*I[i];}
+  var mI=boxMean(I,w,h,r),mp=boxMean(p,w,h,r),mIp=boxMean(Ip,w,h,r),mII=boxMean(II,w,h,r),a=new Float32Array(n),b=new Float32Array(n);
+  for(i=0;i<n;i++){var v=mII[i]-mI[i]*mI[i],cv=mIp[i]-mI[i]*mp[i];a[i]=cv/(v+eps);b[i]=mp[i]-a[i]*mI[i];}
+  var ma=boxMean(a,w,h,r),mb=boxMean(b,w,h,r),q=new Float32Array(n);
+  for(i=0;i<n;i++)q[i]=ma[i]*I[i]+mb[i];
+  return q;
+}
+function setBusy(t){var b=$('busy');if(t){$('busyText').textContent=t;b.hidden=false;}else b.hidden=true;}
+function autoCut(){
+  if(autoBusy||!S.photo)return;
+  var C=ensureCut();if(!C)return;
+  autoBusy=true;$('cutStart').disabled=true;
+  setBusy(SEGMENTER||window.PODIO_SEG_MOCK?'Procurando o atleta…':'Baixando o recortador (só na primeira vez)…');
+  loadSeg().then(function(seg){
+    setBusy('Procurando o atleta…');
+    return new Promise(function(r){setTimeout(function(){r(seg);},30);});
+  }).then(function(seg){
+    var src=photoSrc(),iw=src.naturalWidth||src.width,ih=src.naturalHeight||src.height;
+    /* 1st pass on the whole photo: where is the person */
+    var p1=segPerson(seg,canvasOf(src,0,0,iw,ih,512)),x0=p1.w,y0=p1.h,x1=-1,y1=-1,x,y;
+    for(y=0;y<p1.h;y++)for(x=0;x<p1.w;x++)if(p1.a[y*p1.w+x]>0.5){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}
+    if(x1<0)return 'none';
+    var fx=iw/p1.w,fy=ih/p1.h,bw=(x1-x0+1)*fx,bh=(y1-y0+1)*fy,m=0.14;
+    var sx=Math.max(0,x0*fx-bw*m),sy=Math.max(0,y0*fy-bh*m),ex=Math.min(iw,(x1+1)*fx+bw*m),ey=Math.min(ih,(y1+1)*fy+bh*m);
+    /* 2nd pass on the crop around the person: the model sees the athlete much bigger */
+    var p2=segPerson(seg,canvasOf(src,sx,sy,ex-sx,ey-sy,720));
+    /* write into the cut mask (photo coordinates), refining the edge with the photo itself */
+    var W=C.MW,H=C.MH,kx=W/iw,ky=H/ih,rx=Math.max(0,Math.floor(sx*kx)),ry=Math.max(0,Math.floor(sy*ky)),rw=Math.min(W,Math.ceil(ex*kx))-rx,rh=Math.min(H,Math.ceil(ey*ky))-ry;
+    if(rw<4||rh<4)return 'none';
+    var p=resampleProb(p2,rw,rh),I=new Float32Array(rw*rh),i,pix=C.pix,d=C.img.data;
+    for(y=0;y<rh;y++)for(x=0;x<rw;x++){var q=((ry+y)*W+rx+x)*4;I[y*rw+x]=(pix[q]*0.299+pix[q+1]*0.587+pix[q+2]*0.114)/255;}
+    var rad=Math.max(2,Math.round(Math.max(rw,rh)/90)),gq=guidedFilter(I,p,rw,rh,rad,0.0012);
+    C.undo.push(new Uint8ClampedArray(d));if(C.undo.length>8)C.undo.shift();
+    for(i=3;i<d.length;i+=4)d[i]=0;
+    var any=false;
+    for(y=0;y<rh;y++)for(x=0;x<rw;x++){
+      var v=gq[y*rw+x],t=Math.max(0,Math.min(1,(v-0.38)/0.24)),al=Math.round(t*t*(3-2*t)*255);
+      if(al>0){d[((ry+y)*W+rx+x)*4+3]=al;any=true;}
+    }
+    C.ctx.putImageData(C.img,0,0);C.dirty=true;cutBBox();
+    return any?'ok':'none';
+  }).then(function(r){
+    autoBusy=false;$('cutStart').disabled=false;setBusy(null);
+    if(r==='ok'){S.cutOn=true;updateCutBar();schedule();scheduleThumbs(true);toast('Atleta recortado. Os números ficam atrás.');}
+    else{updateCutBar();enterCut('Não encontrei uma pessoa nessa foto. Marque com o pincel.');}
+  },function(err){
+    autoBusy=false;$('cutStart').disabled=false;setBusy(null);updateCutBar();
+    try{console.warn('autocut',err);}catch(e){}
+    var inClaude=!!window.claude;
+    enterCut(!inClaude?'Não consegui recortar sozinho agora. Confira a internet ou marque com o pincel.':'O recorte automático funciona no site podio-post.vercel.app. Aqui, use o pincel.');
+  });
+}
 
 /* bottom-up gradient */
 var gradGuide=false,gradTimer=0;
