@@ -1582,7 +1582,7 @@ function sponsSize(L){var a=imgAspect(raceImg.spons),w=Math.min(L.W-2*L.pad,(S.f
 function cornerWidth(){
   var w=0;
   if(S.showLogo)w+=logoBox().w+40;
-  if(raceHas('logo'))w+=raceLogoSize(260,120).w+(S.showLogo?28:40);
+  if(raceHas('logo'))w+=raceLogoSize(310,120).w+(S.showLogo?28:40);
   return w;
 }
 function extraOn(){return S.showExtra&&!!logoImg;}
@@ -1599,7 +1599,7 @@ function coBrandItems(L,items,logo,solo){
   }
   if(S.showLogo&&logo)rowB=logo.cy+logo.h/2;
   if(raceHas('logo')){
-    rs=raceLogoSize(260,120);var rx,ry;
+    rs=raceLogoSize(310,120);var rx,ry;
     if(S.showLogo&&logo){
       rx=corner==='tr'?logo.cx-logo.w/2-28-rs.w/2:logo.cx+logo.w/2+28+rs.w/2;
       ry=logo.cy-logo.h/2+rs.h/2;

@@ -23,6 +23,9 @@ Atletas de corrida, ciclismo, HYROX e CrossFit. Organizadores de corridas são p
 - Cada corrida tem link próprio (/c/nome-da-corrida) e pode aparecer na lista de corridas parceiras.
 - Legendas prontas, sugestões de música e dicas de pose.
 
+## Corridas parceiras
+- Movimento com Conexão — link: /c/movimento-com-conexao (logo, moldura story e feed, faixa de patrocinadores)
+
 ## Tecnologia
 - Site estático, sem build: HTML, CSS e JavaScript puro em um único index.html, desenho feito em canvas.
 - Hospedagem: Vercel.
