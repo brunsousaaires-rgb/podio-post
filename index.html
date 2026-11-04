@@ -261,6 +261,10 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radiu
 .segmented label{position:relative;display:flex}
 .segmented span{display:block;width:100%;padding:9px 6px;border-radius:10px;text-align:center;color:var(--text-2);font-weight:700;font-size:14px;white-space:nowrap;cursor:pointer}
 .segmented input:checked + span{background:#fff;color:#121A23;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.segmented.seg5 span{padding:9px 2px;font-size:12.5px;letter-spacing:-.01em}
+.pick-sport{margin-bottom:10px}
+.field input.tcolor,.tcolor{flex:none;width:30px;min-width:30px;height:30px;margin-left:12px;padding:0;border:2px solid rgba(255,255,255,.85);border-radius:50%;background:none;cursor:pointer;-webkit-appearance:none;appearance:none;overflow:hidden}
+.tcolor::-webkit-color-swatch-wrapper{padding:0}.tcolor::-webkit-color-swatch{border:0;border-radius:50%}.tcolor::-moz-color-swatch{border:0;border-radius:50%}
 .segmented input:focus-visible + span{outline:2px solid var(--accent-2);outline-offset:1px}
 
 .thumbs{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;padding:6px;margin:-6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -430,20 +434,30 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radiu
   </header>
   <div class="pick-scroll gut">
     <div class="pick-inner">
+      <div class="segmented seg5 pick-sport" role="radiogroup" aria-label="Esporte">
+        <label><input class="vh" type="radio" name="sportPick" value="corrida" checked><span>Corrida</span></label>
+        <label><input class="vh" type="radio" name="sportPick" value="ciclismo"><span>Ciclismo</span></label>
+        <label><input class="vh" type="radio" name="sportPick" value="hyrox"><span>HYROX</span></label>
+        <label><input class="vh" type="radio" name="sportPick" value="crossfit"><span>CrossFit</span></label>
+        <label><input class="vh" type="radio" name="sportPick" value="futebol"><span>Futebol</span></label>
+      </div>
       <div class="segmented" role="radiogroup" aria-labelledby="lbl-fmt">
         <span class="vh" id="lbl-fmt">Formato</span>
         <label><input class="vh" type="radio" name="fmt" id="f-story" value="story" checked><span>Story 9:16</span></label>
         <label><input class="vh" type="radio" name="fmt" id="f-feed" value="feed"><span>Feed 4:5</span></label>
       </div>
       <div class="mgrid" role="radiogroup" aria-labelledby="pickTitle">
-        <div class="mcard"><input class="vh" type="radio" name="tpl" id="t-percurso" value="percurso" checked aria-label="Percurso"><span class="m-img"><canvas data-layout="percurso" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="percurso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Percurso</span><span class="m-desc">Mapa grande e os números embaixo</span></div>
-        <div class="mcard"><input class="vh" type="radio" name="tpl" id="t-peito" value="peito" aria-label="Peito"><span class="m-img"><canvas data-layout="peito" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="peito"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Peito</span><span class="m-desc">Os números num número de peito de prova</span></div>
-        <div class="mcard"><input class="vh" type="radio" name="tpl" id="t-gigante" value="gigante" aria-label="Gigante"><span class="m-img"><canvas data-layout="gigante" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="gigante"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Gigante</span><span class="m-desc">A distância ocupa a largura da foto</span></div>
-        <div class="mcard"><input class="vh" type="radio" name="tpl" id="t-discreto" value="discreto" aria-label="Discreto"><span class="m-img"><canvas data-layout="discreto" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="discreto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Discreto</span><span class="m-desc">Números pequenos no canto, a foto em primeiro lugar</span></div>
-        <div class="mcard"><input class="vh" type="radio" name="tpl" id="t-relogio" value="relogio" aria-label="Relógio"><span class="m-img"><canvas data-layout="relogio" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="relogio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Relógio</span><span class="m-desc">O tempo no relógio de chegada</span></div>
-        <div class="mcard"><input class="vh" type="radio" name="tpl" id="t-medalha" value="medalha" aria-label="Medalha"><span class="m-img"><canvas data-layout="medalha" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="medalha"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Medalha</span><span class="m-desc">A distância gravada numa medalha</span></div>
-        <div class="mcard"><input class="vh" type="radio" name="tpl" id="t-recibo" value="recibo" aria-label="Recibo"><span class="m-img"><canvas data-layout="recibo" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="recibo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Recibo</span><span class="m-desc">Cada número do treino num recibo</span></div>
-        <div class="mcard"><input class="vh" type="radio" name="tpl" id="t-tv" value="tv" aria-label="TV"><span class="m-img"><canvas data-layout="tv" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="tv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">TV</span><span class="m-desc">Placar de transmissão, como no fim da prova</span></div>
+        <div class="mcard" data-sport="geral"><input class="vh" type="radio" name="tpl" id="t-percurso" value="percurso" checked aria-label="Percurso"><span class="m-img"><canvas data-layout="percurso" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="percurso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Percurso</span><span class="m-desc">Mapa grande e os números embaixo</span></div>
+        <div class="mcard" data-sport="geral"><input class="vh" type="radio" name="tpl" id="t-peito" value="peito" aria-label="Peito"><span class="m-img"><canvas data-layout="peito" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="peito"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Peito</span><span class="m-desc">Os números num número de peito de prova</span></div>
+        <div class="mcard" data-sport="geral"><input class="vh" type="radio" name="tpl" id="t-gigante" value="gigante" aria-label="Gigante"><span class="m-img"><canvas data-layout="gigante" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="gigante"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Gigante</span><span class="m-desc">A distância ocupa a largura da foto</span></div>
+        <div class="mcard" data-sport="geral"><input class="vh" type="radio" name="tpl" id="t-discreto" value="discreto" aria-label="Discreto"><span class="m-img"><canvas data-layout="discreto" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="discreto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Discreto</span><span class="m-desc">Números pequenos no canto, a foto em primeiro lugar</span></div>
+        <div class="mcard" data-sport="geral"><input class="vh" type="radio" name="tpl" id="t-relogio" value="relogio" aria-label="Relógio"><span class="m-img"><canvas data-layout="relogio" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="relogio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Relógio</span><span class="m-desc">O tempo no relógio de chegada</span></div>
+        <div class="mcard" data-sport="geral"><input class="vh" type="radio" name="tpl" id="t-medalha" value="medalha" aria-label="Medalha"><span class="m-img"><canvas data-layout="medalha" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="medalha"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Medalha</span><span class="m-desc">A distância gravada numa medalha</span></div>
+        <div class="mcard" data-sport="geral"><input class="vh" type="radio" name="tpl" id="t-recibo" value="recibo" aria-label="Recibo"><span class="m-img"><canvas data-layout="recibo" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="recibo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Recibo</span><span class="m-desc">Cada número do treino num recibo</span></div>
+        <div class="mcard" data-sport="geral"><input class="vh" type="radio" name="tpl" id="t-tv" value="tv" aria-label="TV"><span class="m-img"><canvas data-layout="tv" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="tv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">TV</span><span class="m-desc">Placar de transmissão, como no fim da prova</span></div>
+        <div class="mcard" data-sport="futebol" hidden><input class="vh" type="radio" name="tpl" id="t-placar" value="placar" aria-label="TV"><span class="m-img"><canvas data-layout="placar" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="placar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">TV</span><span class="m-desc">Placar de transmissão no alto, como no jogo da TV</span></div>
+        <div class="mcard" data-sport="futebol" hidden><input class="vh" type="radio" name="tpl" id="t-telao" value="telao" aria-label="Telão"><span class="m-img"><canvas data-layout="telao" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="telao"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Telão</span><span class="m-desc">Placar de estádio embaixo, com os escudos</span></div>
+        <div class="mcard" data-sport="futebol" hidden><input class="vh" type="radio" name="tpl" id="t-golgig" value="golgig" aria-label="Gigante"><span class="m-img"><canvas data-layout="golgig" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="golgig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Gigante</span><span class="m-desc">O placar enorme atrás dos jogadores</span></div>
       </div>
     </div>
   </div>
@@ -568,14 +582,15 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radiu
     <section class="pane" id="pane-treino" data-pane="treino" role="tabpanel" aria-labelledby="tab-treino">
       <div class="sec">
         <div class="sec-head"><span class="eyebrow" id="lbl-sport">Esporte</span></div>
-        <div class="segmented" role="radiogroup" aria-labelledby="lbl-sport">
+        <div class="segmented seg5" role="radiogroup" aria-labelledby="lbl-sport">
           <label><input class="vh" type="radio" name="sport" id="sp-corrida" value="corrida" checked><span>Corrida</span></label>
           <label><input class="vh" type="radio" name="sport" id="sp-ciclismo" value="ciclismo"><span>Ciclismo</span></label>
           <label><input class="vh" type="radio" name="sport" id="sp-hyrox" value="hyrox"><span>HYROX</span></label>
           <label><input class="vh" type="radio" name="sport" id="sp-crossfit" value="crossfit"><span>CrossFit</span></label>
+          <label><input class="vh" type="radio" name="sport" id="sp-futebol" value="futebol"><span>Futebol</span></label>
         </div>
       </div>
-      <div class="sec">
+      <div class="sec" data-nofoot>
         <div class="group">
           <label class="row ind upload" for="gpxIn">
             <span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6a3 3 0 0 0 0-6h-4a3 3 0 0 1 0-6h6"/></svg></span>
@@ -590,11 +605,16 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radiu
       <div class="sec">
         <div class="sec-head"><span class="eyebrow">Números</span></div>
         <div class="group">
-          <label class="row field" for="fTitle"><span class="fl">Título</span><input id="fTitle" type="text" maxlength="40"><span class="unit"></span></label>
+          <label class="row field" for="fTitle"><span class="fl" id="fTitleLbl">Título</span><input id="fTitle" type="text" maxlength="40"><span class="unit"></span></label>
           <label class="row field" for="fDist" data-route><span class="fl">Distância</span><input id="fDist" class="num" type="text" inputmode="decimal" placeholder="0,00"><span class="unit">km</span></label>
-          <label class="row field" for="fTime"><span class="fl">Tempo</span><input id="fTime" class="num" type="text" inputmode="numeric" placeholder="h:mm:ss"><span class="unit"></span></label>
+          <label class="row field" for="fTime" data-nofoot><span class="fl">Tempo</span><input id="fTime" class="num" type="text" inputmode="numeric" placeholder="h:mm:ss"><span class="unit"></span></label>
           <label class="row field" for="fElev" data-route><span class="fl">Elevação</span><input id="fElev" class="num" type="text" inputmode="numeric" placeholder="0"><span class="unit">m</span></label>
-          <label class="row field" for="fDetail" data-gym hidden><span class="fl">Detalhe</span><input id="fDetail" type="text" maxlength="44"><span class="unit"></span></label>
+          <label class="row field" for="fDetail" data-gym data-nofoot hidden><span class="fl">Detalhe</span><input id="fDetail" type="text" maxlength="44"><span class="unit"></span></label>
+          <label class="row field" for="fTeamA" data-foot hidden><span class="fl">Casa</span><input id="fTeamA" type="text" maxlength="16" placeholder="Nome do time"><input class="tcolor" type="color" id="cTeamA" value="#22A45A" aria-label="Cor do time da casa"></label>
+          <label class="row field" for="fGoalsA" data-foot hidden><span class="fl">Gols</span><input id="fGoalsA" class="num" type="text" inputmode="numeric" maxlength="2" placeholder="0"><span class="unit"></span></label>
+          <label class="row field" for="fTeamB" data-foot hidden><span class="fl">Visitante</span><input id="fTeamB" type="text" maxlength="16" placeholder="Nome do time"><input class="tcolor" type="color" id="cTeamB" value="#2F6BFF" aria-label="Cor do visitante"></label>
+          <label class="row field" for="fGoalsB" data-foot hidden><span class="fl">Gols</span><input id="fGoalsB" class="num" type="text" inputmode="numeric" maxlength="2" placeholder="0"><span class="unit"></span></label>
+          <label class="row field" for="fClock" data-foot hidden><span class="fl">Tempo</span><input id="fClock" type="text" maxlength="18" placeholder="2ºT · 38:12"><span class="unit"></span></label>
           <label class="row field" for="fDate"><span class="fl">Data</span><input id="fDate" class="num" type="text" maxlength="20"><span class="unit"></span></label>
         </div>
       </div>
@@ -729,8 +749,11 @@ var SAMPLES={
   corrida:{title:'Longão de domingo',dist:'10,02',time:'52:06',elev:'84',detail:''},
   ciclismo:{title:'Pedal da serra',dist:'42,6',time:'1:28:40',elev:'380',detail:''},
   hyrox:{title:'HYROX Open',dist:'',time:'1:18:42',elev:'',detail:'8 km de corrida · 8 estações'},
-  crossfit:{title:'WOD Fran',dist:'',time:'5:48',elev:'',detail:'21-15-9 · Rx'}
+  crossfit:{title:'WOD Fran',dist:'',time:'5:48',elev:'',detail:'21-15-9 · Rx'},
+  futebol:{title:'Final da copa',dist:'',time:'',elev:'',detail:''}
 };
+function sampleMatch(){return {a:'Verde',b:'Azul',ga:'2',gb:'0',clock:'2ºT · 38:12',ca:'#22A45A',cb:'#2F6BFF'};}
+var FOOT_TPL={placar:1,telao:1,golgig:1};
 var ROUTE_SPORTS={corrida:true,ciclismo:true};
 var TPL_DESC={
   percurso:'Mapa grande no centro, título em cima e os números embaixo.',
@@ -740,7 +763,10 @@ var TPL_DESC={
   relogio:'O tempo no relógio de chegada, com números de LED.',
   medalha:'Uma medalha com a distância no centro e o nome do treino gravado na borda.',
   recibo:'Um recibo de papel com cada número do treino e o tempo total.',
-  tv:'Placar de transmissão esportiva, como no fim de uma prova na TV.'
+  tv:'Placar de transmissão esportiva, como no fim de uma prova na TV.',
+  placar:'Placar de TV no alto, como na transmissão do jogo.',
+  telao:'Telão de estádio embaixo, com os escudos dos times e o placar grande.',
+  golgig:'O placar em números gigantes, atrás dos jogadores.'
 };
 var STYLE_DESC={
   linha:'O traçado do percurso com brilho, na cor que você escolher.',
@@ -753,7 +779,8 @@ var STYLE_DESC={
 
 var S={sport:'corrida',template:'percurso',mapStyle:'linha',pixel:true,showData:true,showLogo:true,quality:'max',cutOn:false,cutErase:false,cutSize:64,cutEdge:0,logoVar:'full-branco',raceLogo:true,raceSpons:true,raceFrame:true,showExtra:true,extraWhite:false,grad:{on:false,color:'#000000',alpha:80,start:0,end:45},tf:{},hidden:{},sel:null,mapWas:null,format:'story',accent:'#E9B949',darken:0,zoom:100,ox:0,oy:0,
   showMap:true,sign:true,guides:true,photo:null,photoSample:true,route:null,routeSample:true,dataSample:true,
-  title:'',date:fmtDate(new Date()),dist:'',time:'',elev:'',detail:''};
+  title:'',date:fmtDate(new Date()),dist:'',time:'',elev:'',detail:'',match:null};
+S.match=sampleMatch();
 assignSample('corrida');
 var ZMIN=100,ZMAX=400,SHK=1;
 var pointers=new Map(),gest=null,snap={x:false,y:false};
@@ -781,7 +808,7 @@ function lum(hex){
   return 0.2126*f(r)+0.7152*f(g)+0.0722*f(b);
 }
 function inkOn(hex){return lum(hex)>0.42?'#15171C':'#FFFFFF';}
-function assignSample(sp){var s=SAMPLES[sp];S.title=s.title;S.dist=s.dist;S.time=s.time;S.elev=s.elev;S.detail=s.detail;}
+function assignSample(sp){var s=SAMPLES[sp];S.title=s.title;S.dist=s.dist;S.time=s.time;S.elev=s.elev;S.detail=s.detail;if(sp==='futebol')S.match=sampleMatch();}
 
 function metrics(){
   var d=num(S.dist),t=secs(S.time),e=num(S.elev),out={hero:null,stats:[],detail:''};
@@ -1333,7 +1360,7 @@ var logoUnlocked=recall('podio.logoKey')===CODE_HASH;
 
 /* ---------- small drawing helpers for the new layouts ---------- */
 var DEG=Math.PI/180;
-var SPORT_NAME={corrida:'CORRIDA',ciclismo:'CICLISMO',hyrox:'HYROX',crossfit:'CROSSFIT'};
+var SPORT_NAME={corrida:'CORRIDA',ciclismo:'CICLISMO',hyrox:'HYROX',crossfit:'CROSSFIT',futebol:'FUTEBOL'};
 function shade(hex,a){
   var c=hex.replace('#',''),r=parseInt(c.substr(0,2),16),g=parseInt(c.substr(2,2),16),b=parseInt(c.substr(4,2),16);
   var f=function(v){return Math.round(clamp(v+(a<0?v*a:(255-v)*a),0,255));};return 'rgb('+f(r)+','+f(g)+','+f(b)+')';
@@ -1366,7 +1393,7 @@ function arcText(ctx,text,cx,cy,rad,mid,font,color,bottom){
 }
 
 /* ---------- element drawers: each draws inside its own box (0,0)-(w,h) ---------- */
-var EL_NAME={title:'Título',stats:'Números',hero:'Número principal',bib:'Número de peito',giant:'Número gigante',clock:'Relógio',medal:'Medalha',receipt:'Recibo',tv:'Transmissão',score:'Placar',map:'Mapa',logo:'Logo',rlogo:'Logo da corrida',spons:'Patrocinadores',xlogo:'Logo extra'};
+var EL_NAME={title:'Título',stats:'Números',hero:'Número principal',bib:'Número de peito',giant:'Número gigante',clock:'Relógio',medal:'Medalha',receipt:'Recibo',tv:'Transmissão',score:'Placar',board:'Placar',bigscore:'Placar',map:'Mapa',logo:'Logo',rlogo:'Logo da corrida',spons:'Patrocinadores',xlogo:'Logo extra'};
 var DRAW={
   title:function(ctx,it,m,style){
     textShadow(ctx);ctx.fillStyle='#fff';
@@ -1549,6 +1576,50 @@ var DRAW={
     ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=16*SHK;ctx.shadowOffsetY=2*SHK;
     ctx.drawImage(logoSource(),0,0,it.w,it.h);noShadow(ctx);
   },
+  board:function(ctx,it){
+    var d=it.d||{},w=it.w,h=it.h,acc=S.accent,ai=inkOn(acc),r=34,ga=String(d.ga===''||d.ga==null?0:d.ga),gb=String(d.gb===''||d.gb==null?0:d.gb);
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=40*SHK;ctx.shadowOffsetY=14*SHK;
+    var g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'rgba(18,25,41,.95)');g.addColorStop(1,'rgba(7,10,18,.97)');
+    rr(ctx,0,0,w,h,r);ctx.fillStyle=g;ctx.fill();ctx.restore();
+    ctx.save();rr(ctx,0,0,w,h,r);ctx.clip();ctx.fillStyle='rgba(255,255,255,.04)';
+    for(var yy=6;yy<h;yy+=9)for(var xx=6;xx<w;xx+=9)ctx.fillRect(xx,yy,3,3);           /* the LEDs of a stadium screen */
+    ctx.fillStyle=acc;ctx.fillRect(0,0,w,7);ctx.restore();
+    var tt=String(d.title||S.title||'').toUpperCase(),ck=String(d.clock||'').toUpperCase(),cw=0;
+    ctx.textBaseline='middle';
+    if(ck){ctx.font=F.mono(500,26);ls(ctx,4);cw=ctx.measureText(ck).width+56;rr(ctx,w-34-cw,30,cw,52,26);ctx.fillStyle=acc;ctx.fill();ctx.fillStyle=ai;ctx.textAlign='center';ctx.fillText(ck,w-34-cw/2,57);ls(ctx,0);}
+    if(tt){ctx.font=F.mono(500,24);ls(ctx,5);ctx.fillStyle='rgba(255,255,255,.75)';ctx.textAlign='left';var t2=tt;while(t2.length>3&&ctx.measureText(t2).width>w-cw-110)t2=t2.slice(0,-2)+'…';ctx.fillText(t2,40,57);ls(ctx,0);}
+    var cy=h*0.53,cr=Math.min(68,h*0.165);
+    function crest(x,name,col){
+      col=col||'#888';ctx.beginPath();ctx.arc(x,cy,cr,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();ctx.lineWidth=5;ctx.strokeStyle='rgba(255,255,255,.92)';ctx.stroke();
+      var ini=String(name||'').trim().slice(0,3).toUpperCase();ctx.font=F.disp(900,Math.round(cr*0.78));ctx.fillStyle=inkOn(col);ctx.textAlign='center';ctx.fillText(ini,x,cy+2);
+      var n=String(name||'').toUpperCase();fitFont(ctx,n,F.disp,800,46,w*0.3,24);ctx.fillStyle='#fff';ctx.fillText(n,x,cy+cr+42);
+    }
+    crest(w*0.16,d.a,d.ca);crest(w*0.84,d.b,d.cb);
+    var big=ga.length>gb.length?ga:gb,sz=fitFont(ctx,big,function(wt,s2){return F.disp(wt,s2);},900,Math.min(220,h*0.56),w*0.17,80);
+    ctx.font=F.disp(900,sz);ctx.fillStyle='#fff';ctx.textAlign='center';
+    ctx.fillText(ga,w*0.385,cy+sz*0.03);ctx.fillText(gb,w*0.615,cy+sz*0.03);
+    ctx.font=F.disp(700,Math.round(sz*0.38));ctx.fillStyle=acc;ctx.fillText('×',w/2,cy);
+    ctx.textAlign='left';ctx.textBaseline='alphabetic';
+  },
+  bigscore:function(ctx,it){
+    var d=it.d||{},w=it.w,h=it.h,acc=S.accent,ai=inkOn(acc),ga=String(d.ga===''||d.ga==null?0:d.ga),gb=String(d.gb===''||d.gb==null?0:d.gb);
+    textShadow(ctx);
+    var date=S.date.toUpperCase(),ck=String(d.clock||'').toUpperCase();
+    ctx.font=F.mono(500,26);ls(ctx,4);ctx.fillStyle='rgba(255,255,255,.88)';ctx.fillText(date,0,36);var dw=date?ctx.measureText(date).width+24:0;
+    if(ck){var cw=ctx.measureText(ck).width+44;noShadow(ctx);rr(ctx,dw,6,cw,44,22);ctx.fillStyle=acc;ctx.fill();ctx.fillStyle=ai;ctx.fillText(ck,dw+22,37);textShadow(ctx);}
+    ls(ctx,0);
+    var tt=String(d.title||S.title||'').toUpperCase();if(tt){fitFont(ctx,tt,F.disp,800,70,w,30);ctx.fillStyle='#fff';ctx.fillText(tt,0,118);}
+    var top=146,half=w/2-60;
+    function team(n,col,right){
+      var N=String(n||'').toUpperCase();fitFont(ctx,N,F.disp,800,48,half,24);ctx.fillStyle='#fff';ctx.textAlign=right?'right':'left';ctx.fillText(N,right?w:0,top+44);
+      var tw=Math.min(ctx.measureText(N).width,140);noShadow(ctx);ctx.fillStyle=col||'#888';ctx.fillRect(right?w-tw:0,top+60,tw,9);textShadow(ctx);
+    }
+    team(d.a,d.ca,false);team(d.b,d.cb,true);
+    var big=ga.length>gb.length?ga:gb,sz=fitFont(ctx,big,F.disp,900,Math.round((h-top-80)/0.74),half,120);
+    ctx.font=F.disp(900,sz);ctx.fillStyle='#fff';ctx.textAlign='left';ctx.fillText(ga,-sz*0.04,h-8);ctx.textAlign='right';ctx.fillText(gb,w+sz*0.04,h-8);
+    ctx.font=F.disp(800,Math.round(sz*0.3));ctx.fillStyle=acc;ctx.textAlign='center';ctx.fillText('×',w/2,h-8-sz*0.26);
+    ctx.textAlign='left';noShadow(ctx);
+  },
   score:function(ctx,it){
     var d=it.d||{},w=it.w,sl=20,acc=S.accent,ai=inkOn(acc),bh=100,sw=220,tw=(w-sw)/2,sx=tw;
     function para(x,y,pw,ph,col){ctx.beginPath();ctx.moveTo(x+sl,y);ctx.lineTo(x+pw,y);ctx.lineTo(x+pw-sl,y+ph);ctx.lineTo(x,y+ph);ctx.closePath();ctx.fillStyle=col;ctx.fill();}
@@ -1706,6 +1777,14 @@ function layoutDef(L,m,layout,style){
     items.push({id:'receipt',kind:'receipt',w:rw,h:rh,cx:W-pad-rw/2+20,cy:Math.min((L.top+L.bottom)/2+40,L.bottom-rh/2),r:-3*DEG});
     slot={x:pad,y:L.top+20,w:story?280:230,h:story?320:250,anchor:'tl'};logo=logoAt(L,'tr',200,110);
     bg=null;
+  }else if(layout==='telao'){ // football: stadium screen at the bottom
+    var th=story?420:370;items.push({id:'board',kind:'board',w:W-2*pad,h:th,cx:W/2,cy:L.bottom-th/2,r:0,d:S.match||{}});
+    logo=logoAt(L,'tr',200,120);
+    bg=function(ctx){vgrad(ctx,L.bottom-th*1.7,H,0,0.7,W);};
+  }else if(layout==='golgig'){ // football: giant score behind the players
+    var sh2=story?640:520;items.push({id:'bigscore',kind:'bigscore',w:W-2*pad,h:sh2,cx:W/2,cy:L.bottom+6-sh2/2,r:0,d:S.match||{}});
+    logo=logoAt(L,'tr',200,120);
+    bg=function(ctx){vgrad(ctx,H*0.32,H,0,0.82,W);};
   }else if(layout==='placar'){ // football: the score, broadcast style
     var pw=story?780:760,ph=166;items.push({id:'score',kind:'score',w:pw,h:ph,cx:pad+pw/2,cy:L.top+24+ph/2,r:0,d:S.match||{}});
     logo=logoAt(L,'tr',200,120);
@@ -1739,7 +1818,7 @@ function tfFor(it,pre){var t=S.tf[pre+it.id];return t?t:{x:it.cx,y:it.cy,s:1,r:i
 
 /* ---------- each sticker is cached as its own image, then placed with move / scale / rotate ---------- */
 var elCache={},fontsVer=0,scalingId=null,gestTarget=null;
-function contentKey(){return [S.title,S.date,S.dist,S.time,S.elev,S.detail,S.sport,S.accent,S.mapStyle,routeVer,logoVer,S.logoVar,raceVer,race?race.id:'',S.extraWhite,S.format,fontsVer].join('|');}
+function contentKey(){return [S.title,S.date,S.dist,S.time,S.elev,S.detail,S.sport,S.accent,S.mapStyle,routeVer,logoVer,S.logoVar,raceVer,race?race.id:'',S.extraWhite,S.format,fontsVer,S.sport==='futebol'?JSON.stringify(S.match):''].join('|');}
 function drawElLocal(ctx,it,style){resetText(ctx);if(it.kind==='map')WIDGETS[it.style](ctx,it.w,it.h);else DRAW[it.kind](ctx,it,metrics(),style);resetText(ctx);}
 function elImage(it,s,stale){
   var key=it.kind+'|'+(it.variant||'')+'|'+Math.round(it.w)+'|'+Math.round(it.h)+'|'+(it.style||'')+'|'+contentKey(),c=elCache[it.id];
@@ -1919,6 +1998,12 @@ function gpxStats(pts,sport){
 
 /* ---------- tips content ---------- */
 var POSES={
+  futebol:[
+    ['Disputa de bola','Câmera baixa, na altura da bola, pegando os dois jogadores no lance. É a foto que pede o placar no alto.'],
+    ['Comemoração do gol','Braços abertos, correndo para a câmera ou abraçando o time. Deixa espaço em cima para o placar.'],
+    ['Time perfilado','Todos lado a lado antes do jogo, câmera no meio do grupo. Combina com o modelo Telão.'],
+    ['Com a bola no pé','Jogador parado, pé em cima da bola, olhando para a câmera. Fica forte no modelo Gigante, com o placar atrás.']
+  ],
   corrida:[
     ['Câmera baixa, você vindo','Celular na altura do joelho e você correndo na direção dele. As pernas ficam mais longas e a passada aparece. Use o modo sequência.'],
     ['De costas para a câmera','Você olhando o caminho à frente, de preferência com a luz do fim de tarde. Deixa céu livre para os números.'],
@@ -1952,10 +2037,11 @@ var MUSIC={
   corrida:{a:['Cadência','160–180','passos por minuto'],b:['Música','160–180','BPM, ou a metade (80–90)'],note:'Música no ritmo da passada casa com vídeo de corrida. Ela entra pelo adesivo de música do próprio Instagram.'},
   ciclismo:{a:['Cadência','80–95','giros por minuto'],b:['Música','80–95','BPM, ou o dobro'],note:'A batida acompanha o giro do pedal. A música entra pelo adesivo de música do Instagram.'},
   hyrox:{a:['Duração','1–2 h','prova completa'],b:['Música','125–140','BPM'],note:'Batida forte, com o corte do vídeo nas trocas de estação.'},
-  crossfit:{a:['Treino','5–20','minutos'],b:['Música','140–150','BPM'],note:'Batida pesada, com o corte no último rep.'}
+  crossfit:{a:['Treino','5–20','minutos'],b:['Música','140–150','BPM'],note:'Batida pesada, com o corte no último rep.'},
+  futebol:{a:['Vídeo','15–30','segundos de lances'],b:['Música','120–130','BPM'],note:'Corte no gol ou no apito final. A música entra pelo adesivo de música do Instagram.'}
 };
 function statTile(t){return '<div class="stat"><span class="eyebrow">'+t[0]+'</span><span class="v">'+t[1]+'</span><span class="u">'+t[2]+'</span></div>';}
-var TAGS={corrida:'#corridaderua #corrida #treino',ciclismo:'#ciclismo #pedal #bike',hyrox:'#hyrox #hyroxbrasil #treino',crossfit:'#crossfit #wod #treino'};
+var TAGS={corrida:'#corridaderua #corrida #treino',ciclismo:'#ciclismo #pedal #bike',hyrox:'#hyrox #hyroxbrasil #treino',crossfit:'#crossfit #wod #treino',futebol:'#futebol #futebolbrasileiro #jogo'};
 
 function captions(){
   var d=num(S.dist),t=secs(S.time),e=Math.round(num(S.elev)),T=S.title.trim()||'Treino feito',time=t?fmtT(t):'',det=S.detail.trim(),out;
@@ -1972,6 +2058,13 @@ function captions(){
       kmc&&vel?kmc+' km de pedal a '+vel+' km/h de média.'+(e?' '+e+' m de subida para contar história.':''):T+'. Pedal feito.',
       time?T+': '+time+' em cima da bike.':T+'.',
       'Giro, vento'+(kmc?' e '+kmc+' km':'')+'. Bora de novo no fim de semana?'
+    ];
+  }else if(S.sport==='futebol'){
+    var M=S.match||{},A=(M.a||'Casa').trim(),B=(M.b||'Visitante').trim(),ga=+M.ga||0,gb=+M.gb||0,placar=A+' '+ga+' × '+gb+' '+B;
+    out=[
+      placar+'. '+(ga===gb?'Empate com cara de revanche.':'Que jogo!'),
+      (S.title.trim()?S.title.trim()+': ':'')+placar+'. Bola rolando, coração na boca.',
+      'Fim de jogo: '+placar+'. Bora pro próximo!'
     ];
   }else if(S.sport==='hyrox'){
     out=[
@@ -2001,18 +2094,24 @@ function schedule(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;ren
 function scheduleThumbs(now){clearTimeout(thumbTimer);thumbTimer=setTimeout(renderThumbs,now?0:180);}
 function renderThumbs(){
   if(screen==='home')renderHome();
-  if(screen==='pick')document.querySelectorAll('canvas[data-layout]').forEach(function(c){renderThumb(c,c.getAttribute('data-layout'),S.mapStyle);});
+  if(screen==='pick')document.querySelectorAll('canvas[data-layout]').forEach(function(c){if(c.closest('.mcard[hidden]'))return;renderThumb(c,c.getAttribute('data-layout'),S.mapStyle);});
   if(screen==='editor'&&!$('pane-mapa').hidden)document.querySelectorAll('canvas[data-style]').forEach(function(c){renderThumb(c,S.template,c.getAttribute('data-style'));});
 }
 
 function setRange(el){var p=(el.value-el.min)/(el.max-el.min)*100;el.style.setProperty('--p',p+'%');}
 function syncFields(){
   $('fTitle').value=S.title;$('fDist').value=S.dist;$('fTime').value=S.time;$('fElev').value=S.elev;$('fDetail').value=S.detail;$('fDate').value=S.date;
+  var M=S.match||{};$('fTeamA').value=M.a||'';$('fTeamB').value=M.b||'';$('fGoalsA').value=M.ga==null?'':M.ga;$('fGoalsB').value=M.gb==null?'':M.gb;$('fClock').value=M.clock||'';$('cTeamA').value=M.ca||'#22A45A';$('cTeamB').value=M.cb||'#2F6BFF';
 }
 function updateSportUI(){
-  var routeSport=!!ROUTE_SPORTS[S.sport];
+  var routeSport=!!ROUTE_SPORTS[S.sport],foot=S.sport==='futebol';
   document.querySelectorAll('[data-route]').forEach(function(el){el.hidden=!routeSport;});
   document.querySelectorAll('[data-gym]').forEach(function(el){el.hidden=routeSport;});
+  document.querySelectorAll('[data-nofoot]').forEach(function(el){if(foot)el.hidden=true;else if(!el.hasAttribute('data-gym'))el.hidden=false;});
+  document.querySelectorAll('[data-foot]').forEach(function(el){el.hidden=!foot;});
+  $('fTitleLbl').textContent=foot?'Campeonato':'Título';
+  document.querySelectorAll('input[name="sportPick"]').forEach(function(i){i.checked=i.value===S.sport;});
+  updateModelGrid();
   $('showMap').disabled=!routeSport;$('mapRow').classList.toggle('off',!routeSport);
   document.querySelectorAll('.thumb[data-map]').forEach(function(t){t.classList.toggle('dis',!routeSport);t.querySelector('input').disabled=!routeSport;});
   $('mapNote').hidden=routeSport;$('mapRow').hidden=!routeSport;
@@ -2025,6 +2124,7 @@ function updatePill(){
 }
 function updateCalc(){
   var m=metrics(),el=$('calcHint');
+  if(S.sport==='futebol'){var M=S.match||{};el.className='result';el.textContent='Placar: '+(M.a||'Casa')+' '+(M.ga||0)+' × '+(M.gb||0)+' '+(M.b||'Visitante')+(M.clock?' · '+M.clock:'');return;}
   if(!m.hero){el.className='result warn';el.textContent='Preencha pelo menos o tempo'+(ROUTE_SPORTS[S.sport]?' ou a distância':'')+' para aparecer na imagem.';return;}
   var st=m.stats[0],label=m.hero.label,value=m.hero.value+(m.hero.unit?' '+m.hero.unit:'');
   if(S.sport==='corrida'&&st&&st.label==='Ritmo'){label='Ritmo médio';value=st.value+' /km';}
@@ -2104,8 +2204,18 @@ $('expand').addEventListener('click',function(){$('app').classList.toggle('colla
 
 /* inputs */
 document.querySelectorAll('input[name="sport"]').forEach(function(r){r.addEventListener('change',function(){
-  S.sport=r.value;if(S.dataSample){assignSample(S.sport);syncFields();}updateSportUI();schedule();
+  S.sport=r.value;if(S.dataSample){assignSample(S.sport);syncFields();}updateSportUI();schedule();scheduleThumbs(true);
 });});
+document.querySelectorAll('input[name="sportPick"]').forEach(function(r){r.addEventListener('change',function(){var t=$('sp-'+r.value);if(t&&!t.checked)t.click();});});
+/* football has its own three models; the other sports share the eight */
+function updateModelGrid(){
+  var foot=S.sport==='futebol';
+  document.querySelectorAll('.mcard[data-sport]').forEach(function(c){c.hidden=(c.getAttribute('data-sport')==='futebol')!==foot;});
+  if(foot!==!!FOOT_TPL[S.template]){var t=$(foot?'t-placar':'t-percurso');t.checked=true;t.dispatchEvent(new Event('change'));}
+}
+[['fTeamA','a'],['fTeamB','b'],['fClock','clock']].forEach(function(p){$(p[0]).addEventListener('input',function(){S.match[p[1]]=this.value;S.dataSample=false;schedule();});});
+[['fGoalsA','ga'],['fGoalsB','gb']].forEach(function(p){$(p[0]).addEventListener('input',function(){var v=this.value.replace(/\D/g,'').slice(0,2);if(v!==this.value)this.value=v;S.match[p[1]]=v;S.dataSample=false;schedule();});});
+[['cTeamA','ca'],['cTeamB','cb']].forEach(function(p){$(p[0]).addEventListener('input',function(){S.match[p[1]]=this.value;schedule();});});
 document.querySelectorAll('input[name="tpl"]').forEach(function(r){r.addEventListener('change',function(){S.template=r.value;S.sel=null;updateSelTool();$('modelName').textContent=TPL_NAME[S.template]||'Modelo';schedule();});});
 document.querySelectorAll('input[name="mapStyle"]').forEach(function(r){r.addEventListener('change',function(){
   S.mapStyle=r.value;$('tplDesc').textContent=STYLE_DESC[S.mapStyle];$('pixelRow').hidden=S.mapStyle!=='retro';schedule();
@@ -2239,7 +2349,7 @@ function raceFromURL(){
 document.querySelectorAll('input[name="quality"]').forEach(function(r){r.addEventListener('change',function(){S.quality=r.value;store('podio.quality',S.quality);updateQNote();});});
 /* ---------- screens: início → modelo → editor ---------- */
 var screen='home',histOK=true,editedOnce=false,DEPTH={home:0,pick:1,editor:2};
-var TPL_NAME={percurso:'Percurso',peito:'Peito',gigante:'Gigante',discreto:'Discreto',relogio:'Relógio',medalha:'Medalha',recibo:'Recibo',tv:'TV'};
+var TPL_NAME={percurso:'Percurso',peito:'Peito',gigante:'Gigante',discreto:'Discreto',relogio:'Relógio',medalha:'Medalha',recibo:'Recibo',tv:'TV',placar:'Placar TV',telao:'Telão',golgig:'Placar gigante'};
 function go(name){
   if(cutMode)exitCut();
   screen=name;document.body.setAttribute('data-screen',name);closeLogoMenu();
@@ -2263,7 +2373,7 @@ var HOME_EMBED={"hyrox":{"photo":"/home/hyrox.jpg","mask":"/home/hyrox-mask.png"
 var HOME_CARDS={
   corrida:{sport:'corrida',layout:'discreto',style:'linha',race:true,cut:true,place:{title:{s:0.72,at:'bl'},map:{s:0.8,at:'br'}}},
   hyrox:{sport:'hyrox',layout:'gigante',style:'linha',cut:false},
-  futebol:{sport:'corrida',layout:'placar',style:'linha',cut:false,title:'Final da copa',
+  futebol:{sport:'futebol',layout:'placar',style:'linha',cut:false,title:'Final da copa',
     match:{a:'Verde',b:'Azul',ga:2,gb:0,clock:'2ºT · 38:12',ca:'#22A45A',cb:'#2F6BFF',title:'Final da copa'}}
 };
 var HOME_IMG={};

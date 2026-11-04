@@ -3,7 +3,7 @@
 App web (site que funciona como app no celular) para atletas transformarem a foto do treino ou da prova em uma imagem pronta para o Instagram, no formato Story (9:16) ou Feed (4:5).
 
 ## Público
-Atletas de corrida, ciclismo, HYROX e CrossFit. Organizadores de corridas são parceiros pagantes: cada corrida parceira ganha um pacote com a arte oficial dela dentro do app.
+Atletas de corrida, ciclismo, HYROX, CrossFit e futebol. Organizadores de corridas são parceiros pagantes: cada corrida parceira ganha um pacote com a arte oficial dela dentro do app.
 
 ## Como o atleta usa
 1. Início: escolhe a foto (ou usa a foto de exemplo).
@@ -21,6 +21,7 @@ Atletas de corrida, ciclismo, HYROX e CrossFit. Organizadores de corridas são p
 - Itens escondidos pelo olho voltam pelo botão “Mostrar ocultos”.
 - Pacote da corrida: logo da corrida, faixa de patrocinadores, moldura oficial (story e feed), nome, data, distâncias, cor, hashtag e @ nas legendas.
 - Cada corrida tem link próprio (/c/nome-da-corrida) e pode aparecer na lista de corridas parceiras.
+- Futebol: nome e cor dos times, placar e tempo de jogo, em 3 modelos (TV, Telão e Gigante).
 - Legendas prontas, sugestões de música e dicas de pose.
 
 ## Corridas parceiras
