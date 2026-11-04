@@ -2251,7 +2251,7 @@ var FRONT={logo:1,rlogo:1,xlogo:1,spons:1};
 function ensureCut(){
   if(CUT&&CUT.src===S.photo)return CUT;
   var src=photoSrc();if(!src)return null;
-  var iw=src.naturalWidth||src.width,ih=src.naturalHeight||src.height,k=Math.min(1,1280/Math.max(iw,ih));
+  var iw=src.naturalWidth||src.width,ih=src.naturalHeight||src.height,k=Math.min(1,1600/Math.max(iw,ih));
   var MW=Math.max(1,Math.round(iw*k)),MH=Math.max(1,Math.round(ih*k));
   var sc=document.createElement('canvas');sc.width=MW;sc.height=MH;var sx=sc.getContext('2d');sx.drawImage(src,0,0,MW,MH);
   var c=document.createElement('canvas');c.width=MW;c.height=MH;var cx=c.getContext('2d'),img=cx.createImageData(MW,MH),d=img.data;
@@ -2259,6 +2259,7 @@ function ensureCut(){
   CUT={src:S.photo,MW:MW,MH:MH,pix:sx.getImageData(0,0,MW,MH).data,img:img,canvas:c,ctx:cx,bbox:null,dirty:true,painted:false,undo:[]};
   return CUT;
 }
+function cutAlpha(){var d=CUT.img.data,a=new Uint8Array(d.length/4);for(var i=0,j=3;i<a.length;i++,j+=4)a[i]=d[j];return a;}
 function cutReady(){return S.cutOn&&!!CUT&&CUT.src===S.photo&&CUT.painted;}
 function photoRect(L){
   var g=photoGeom(L);if(!g)return null;
@@ -2312,7 +2313,7 @@ function cutDown(e){
   e.preventDefault();var pc=toCanvas(e);
   if(cutStroke){cutStroke=null;return;}                       /* a second finger cancels the stroke */
   if(!ensureCut())return;
-  CUT.undo.push(new Uint8ClampedArray(CUT.img.data));if(CUT.undo.length>8)CUT.undo.shift();
+  CUT.undo.push(cutAlpha());if(CUT.undo.length>8)CUT.undo.shift();
   try{view.setPointerCapture(e.pointerId);}catch(err){}
   cutStroke={id:e.pointerId,last:null};cutCursor=pc;cutDraw(pc);updateCutBar();schedule();
 }
@@ -2381,36 +2382,45 @@ function resetCut(){CUT=null;S.cutOn=false;if(cutMode)exitCut();updateCutBar();}
 $('cutStart').addEventListener('click',function(){var has=!!(CUT&&CUT.src===S.photo&&CUT.painted);if(has)enterCut();else autoCut();});
 $('cutDone').addEventListener('click',exitCut);
 $('cutUndo').addEventListener('click',function(){
-  if(!CUT||!CUT.undo.length)return;CUT.img.data.set(CUT.undo.pop());CUT.ctx.putImageData(CUT.img,0,0);CUT.dirty=true;cutBBox();updateCutBar();schedule();
+  if(!CUT||!CUT.undo.length)return;var ua=CUT.undo.pop(),ud=CUT.img.data;for(var ui=0,uj=3;ui<ua.length;ui++,uj+=4)ud[uj]=ua[ui];CUT.ctx.putImageData(CUT.img,0,0);CUT.dirty=true;cutBBox();updateCutBar();schedule();
 });
 $('cutClear').addEventListener('click',function(){resetCut();schedule();scheduleThumbs(true);toast('Recorte apagado');});
 $('cutOn').addEventListener('change',function(){S.cutOn=this.checked;schedule();scheduleThumbs(true);});
 document.querySelectorAll('input[name="cutTool"]').forEach(function(r){r.addEventListener('change',function(){S.cutErase=r.value==='erase';schedule();});});
 $('cutSize').addEventListener('input',function(){S.cutSize=+this.value;setRange(this);if(!cutCursor){var L=FORMATS[S.format];cutCursor={x:0,y:0};}schedule();});
 
-/* ---------- automatic athlete cut-out: MediaPipe person segmentation on the device, edges refined with the photo ---------- */
+/* ---------- automatic athlete cut-out: MediaPipe on the device, in tiles, edges refined with the photo's colours ---------- */
 var MP_BASE='https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
-var SEG_MODEL='https://storage.googleapis.com/mediapipe-models/image_segmenter/deeplab_v3/float32/1/deeplab_v3.tflite';
-var SEGMENTER=null,segLoading=null,autoBusy=false;
+var SEG_MODELS={
+  body:'https://storage.googleapis.com/mediapipe-models/image_segmenter/deeplab_v3/float32/1/deeplab_v3.tflite',
+  head:'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite'
+};
+var SEGMENTERS={},segLoading=null,autoBusy=false;
 function withTimeout(p,ms){return new Promise(function(res,rej){var t=setTimeout(function(){rej(new Error('timeout'));},ms);p.then(function(v){clearTimeout(t);res(v);},function(e){clearTimeout(t);rej(e);});});}
 function loadSeg(){
-  if(window.PODIO_SEG_MOCK)return Promise.resolve({mock:window.PODIO_SEG_MOCK});
-  if(SEGMENTER)return Promise.resolve(SEGMENTER);
+  if(window.PODIO_SEG_MOCK)return Promise.resolve({body:{mock:'body'},head:{mock:'head'}});
+  if(SEGMENTERS.body)return Promise.resolve(SEGMENTERS);
   if(segLoading)return segLoading;
   segLoading=withTimeout(import(MP_BASE+'/vision_bundle.mjs').then(function(v){
     return v.FilesetResolver.forVisionTasks(MP_BASE+'/wasm').then(function(files){
-      var make=function(delegate){return v.ImageSegmenter.createFromOptions(files,{baseOptions:{modelAssetPath:SEG_MODEL,delegate:delegate},runningMode:'IMAGE',outputCategoryMask:false,outputConfidenceMasks:true});};
-      return make('GPU').catch(function(){return make('CPU');});
+      var make=function(url,delegate){return v.ImageSegmenter.createFromOptions(files,{baseOptions:{modelAssetPath:url,delegate:delegate},runningMode:'IMAGE',outputCategoryMask:false,outputConfidenceMasks:true});};
+      var one=function(url){return make(url,'GPU').catch(function(){return make(url,'CPU');});};
+      return one(SEG_MODELS.body).then(function(body){
+        SEGMENTERS.body=body;
+        return one(SEG_MODELS.head).then(function(head){SEGMENTERS.head=head;},function(){/* the head model is a bonus */});
+      });
     });
-  }),60000).then(function(s){SEGMENTER=s;return s;},function(e){segLoading=null;throw e;});
+  }),70000).then(function(){return SEGMENTERS;},function(e){segLoading=null;throw e;});
   return segLoading;
 }
-/* person probability for an image (canvas); deeplab class 15 is "person" */
+/* person probability for a canvas: picks the "person" output whatever model it is */
 function segPerson(seg,canvas){
-  if(seg.mock)return seg.mock(canvas);
-  var res=seg.segment(canvas),ms=res.confidenceMasks||[],m=ms[15]||ms[ms.length-1];
+  if(seg.mock)return window.PODIO_SEG_MOCK(canvas,seg.mock);
+  var res=seg.segment(canvas),ms=res.confidenceMasks||[],n=ms.length,m=null,inv=false;
+  if(n>=21)m=ms[15];else if(n===6){m=ms[0];inv=true;}else if(n===2)m=ms[1];else if(n===1)m=ms[0];
   if(!m){if(res.close)res.close();throw new Error('no mask');}
-  var out={w:m.width,h:m.height,a:new Float32Array(m.getAsFloat32Array())};
+  var a=new Float32Array(m.getAsFloat32Array());if(inv)for(var i=0;i<a.length;i++)a[i]=1-a[i];
+  var out={w:m.width,h:m.height,a:a};
   if(res.close)res.close();else ms.forEach(function(x){if(x.close)x.close();});
   return out;
 }
@@ -2424,57 +2434,101 @@ function resampleProb(p,w,h){
   var c=document.createElement('canvas');c.width=p.w;c.height=p.h;var g=c.getContext('2d'),img=g.createImageData(p.w,p.h),d=img.data;
   for(var i=0;i<p.a.length;i++){var v=Math.max(0,Math.min(255,Math.round(p.a[i]*255)));d[i*4]=v;d[i*4+1]=v;d[i*4+2]=v;d[i*4+3]=255;}
   g.putImageData(img,0,0);
-  var o=document.createElement('canvas');o.width=w;o.height=h;var og=o.getContext('2d');og.imageSmoothingEnabled=true;og.imageSmoothingQuality='high';og.drawImage(c,0,0,w,h);
-  var od=og.getImageData(0,0,w,h).data,out=new Float32Array(w*h);for(i=0;i<out.length;i++)out[i]=od[i*4]/255;return out;
+  var o=document.createElement('canvas');o.width=Math.max(1,w);o.height=Math.max(1,h);var og=o.getContext('2d');og.imageSmoothingEnabled=true;og.imageSmoothingQuality='high';og.drawImage(c,0,0,o.width,o.height);
+  var od=og.getImageData(0,0,o.width,o.height).data,out=new Float32Array(o.width*o.height);for(i=0;i<out.length;i++)out[i]=od[i*4]/255;return out;
+}
+/* a second model's mask may come inverted: orient it by agreement with the body model */
+function orientLike(a,ref){
+  var s=0,t=0;for(var i=0;i<a.length;i++){s+=Math.abs(a[i]-ref[i]);t+=Math.abs(1-a[i]-ref[i]);}
+  if(t<s)for(i=0;i<a.length;i++)a[i]=1-a[i];
+  return a;
 }
 /* box mean with an integral image (O(n)) */
 function boxMean(src,w,h,r){
-  var S=new Float64Array((w+1)*(h+1)),x,y,out=new Float32Array(w*h);
-  for(y=0;y<h;y++){var row=0;for(x=0;x<w;x++){row+=src[y*w+x];S[(y+1)*(w+1)+x+1]=S[y*(w+1)+x+1]+row;}}
-  for(y=0;y<h;y++){var y0=Math.max(0,y-r),y1=Math.min(h,y+r+1);for(x=0;x<w;x++){var x0=Math.max(0,x-r),x1=Math.min(w,x+r+1);
-    out[y*w+x]=(S[y1*(w+1)+x1]-S[y0*(w+1)+x1]-S[y1*(w+1)+x0]+S[y0*(w+1)+x0])/((y1-y0)*(x1-x0));}}
+  var S=new Float64Array((w+1)*(h+1)),x,y,out=new Float32Array(w*h),W1=w+1;
+  for(y=0;y<h;y++){var row=0,o=(y+1)*W1,u=y*W1;for(x=0;x<w;x++){row+=src[y*w+x];S[o+x+1]=S[u+x+1]+row;}}
+  for(y=0;y<h;y++){var y0=Math.max(0,y-r),y1=Math.min(h,y+r+1),a0=y0*W1,a1=y1*W1;for(x=0;x<w;x++){var x0=Math.max(0,x-r),x1=Math.min(w,x+r+1);
+    out[y*w+x]=(S[a1+x1]-S[a0+x1]-S[a1+x0]+S[a0+x0])/((y1-y0)*(x1-x0));}}
   return out;
 }
-/* guided filter (He et al.): moves the soft mask's edge onto the photo's real edges */
-function guidedFilter(I,p,w,h,r,eps){
-  var n=w*h,Ip=new Float32Array(n),II=new Float32Array(n),i;
-  for(i=0;i<n;i++){Ip[i]=I[i]*p[i];II[i]=I[i]*I[i];}
-  var mI=boxMean(I,w,h,r),mp=boxMean(p,w,h,r),mIp=boxMean(Ip,w,h,r),mII=boxMean(II,w,h,r),a=new Float32Array(n),b=new Float32Array(n);
-  for(i=0;i<n;i++){var v=mII[i]-mI[i]*mI[i],cv=mIp[i]-mI[i]*mp[i];a[i]=cv/(v+eps);b[i]=mp[i]-a[i]*mI[i];}
-  var ma=boxMean(a,w,h,r),mb=boxMean(b,w,h,r),q=new Float32Array(n);
-  for(i=0;i<n;i++)q[i]=ma[i]*I[i]+mb[i];
+/* colour guided filter (He et al.): snaps the soft mask's edge to the photo's real colour edges */
+function guidedFilterRGB(R,G,B,p,w,h,r,eps){
+  var n=w*h,i,t=function(f){var o=new Float32Array(n);for(var k=0;k<n;k++)o[k]=f(k);return o;};
+  var mR=boxMean(R,w,h,r),mG=boxMean(G,w,h,r),mB=boxMean(B,w,h,r),mp=boxMean(p,w,h,r);
+  var mRp=boxMean(t(function(k){return R[k]*p[k];}),w,h,r),mGp=boxMean(t(function(k){return G[k]*p[k];}),w,h,r),mBp=boxMean(t(function(k){return B[k]*p[k];}),w,h,r);
+  var vRR=boxMean(t(function(k){return R[k]*R[k];}),w,h,r),vRG=boxMean(t(function(k){return R[k]*G[k];}),w,h,r),vRB=boxMean(t(function(k){return R[k]*B[k];}),w,h,r);
+  var vGG=boxMean(t(function(k){return G[k]*G[k];}),w,h,r),vGB=boxMean(t(function(k){return G[k]*B[k];}),w,h,r),vBB=boxMean(t(function(k){return B[k]*B[k];}),w,h,r);
+  var aR=new Float32Array(n),aG=new Float32Array(n),aB=new Float32Array(n),bb=new Float32Array(n);
+  for(i=0;i<n;i++){
+    var rr=vRR[i]-mR[i]*mR[i]+eps,rg=vRG[i]-mR[i]*mG[i],rb=vRB[i]-mR[i]*mB[i],gg=vGG[i]-mG[i]*mG[i]+eps,gb=vGB[i]-mG[i]*mB[i],b2=vBB[i]-mB[i]*mB[i]+eps;
+    var cR=mRp[i]-mR[i]*mp[i],cG=mGp[i]-mG[i]*mp[i],cB=mBp[i]-mB[i]*mp[i];
+    /* inverse of the symmetric 3x3 covariance */
+    var i00=gg*b2-gb*gb,i01=gb*rb-rg*b2,i02=rg*gb-gg*rb,i11=rr*b2-rb*rb,i12=rb*rg-rr*gb,i22=rr*gg-rg*rg,det=rr*i00+rg*i01+rb*i02;
+    if(Math.abs(det)<1e-12){aR[i]=aG[i]=aB[i]=0;bb[i]=mp[i];continue;}
+    var A=(i00*cR+i01*cG+i02*cB)/det,Bv=(i01*cR+i11*cG+i12*cB)/det,C=(i02*cR+i12*cG+i22*cB)/det;
+    aR[i]=A;aG[i]=Bv;aB[i]=C;bb[i]=mp[i]-A*mR[i]-Bv*mG[i]-C*mB[i];
+  }
+  var qa=boxMean(aR,w,h,r),qg=boxMean(aG,w,h,r),qb=boxMean(aB,w,h,r),q0=boxMean(bb,w,h,r),q=new Float32Array(n);
+  for(i=0;i<n;i++)q[i]=qa[i]*R[i]+qg[i]*G[i]+qb[i]*B[i]+q0[i];
   return q;
 }
 function setBusy(t){var b=$('busy');if(t){$('busyText').textContent=t;b.hidden=false;}else b.hidden=true;}
+function clampRect(x0,y0,x1,y1,W,H){return [Math.max(0,x0),Math.max(0,y0),Math.min(W,x1),Math.min(H,y1)];}
 function autoCut(){
   if(autoBusy||!S.photo)return;
   var C=ensureCut();if(!C)return;
   autoBusy=true;$('cutStart').disabled=true;
-  setBusy(SEGMENTER||window.PODIO_SEG_MOCK?'Procurando o atleta…':'Baixando o recortador (só na primeira vez)…');
-  loadSeg().then(function(seg){
+  setBusy(SEGMENTERS.body||window.PODIO_SEG_MOCK?'Procurando o atleta…':'Baixando o recortador (só na primeira vez)…');
+  loadSeg().then(function(segs){
     setBusy('Procurando o atleta…');
-    return new Promise(function(r){setTimeout(function(){r(seg);},30);});
-  }).then(function(seg){
-    var src=photoSrc(),iw=src.naturalWidth||src.width,ih=src.naturalHeight||src.height;
-    /* 1st pass on the whole photo: where is the person */
-    var p1=segPerson(seg,canvasOf(src,0,0,iw,ih,512)),x0=p1.w,y0=p1.h,x1=-1,y1=-1,x,y;
+    return new Promise(function(r){setTimeout(function(){r(segs);},30);});
+  }).then(function(segs){
+    var src=photoSrc(),iw=src.naturalWidth||src.width,ih=src.naturalHeight||src.height,x,y,i;
+    /* 1 · where is the person */
+    var p1=segPerson(segs.body,canvasOf(src,0,0,iw,ih,512)),x0=p1.w,y0=p1.h,x1=-1,y1=-1;
     for(y=0;y<p1.h;y++)for(x=0;x<p1.w;x++)if(p1.a[y*p1.w+x]>0.5){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}
     if(x1<0)return 'none';
-    var fx=iw/p1.w,fy=ih/p1.h,bw=(x1-x0+1)*fx,bh=(y1-y0+1)*fy,m=0.14;
-    var sx=Math.max(0,x0*fx-bw*m),sy=Math.max(0,y0*fy-bh*m),ex=Math.min(iw,(x1+1)*fx+bw*m),ey=Math.min(ih,(y1+1)*fy+bh*m);
-    /* 2nd pass on the crop around the person: the model sees the athlete much bigger */
-    var p2=segPerson(seg,canvasOf(src,sx,sy,ex-sx,ey-sy,720));
-    /* write into the cut mask (photo coordinates), refining the edge with the photo itself */
-    var W=C.MW,H=C.MH,kx=W/iw,ky=H/ih,rx=Math.max(0,Math.floor(sx*kx)),ry=Math.max(0,Math.floor(sy*ky)),rw=Math.min(W,Math.ceil(ex*kx))-rx,rh=Math.min(H,Math.ceil(ey*ky))-ry;
+    var fx=iw/p1.w,fy=ih/p1.h,bw=(x1-x0+1)*fx,bh=(y1-y0+1)*fy;
+    var box=clampRect(x0*fx-bw*0.12,y0*fy-bh*0.08,(x1+1)*fx+bw*0.12,(y1+1)*fy+bh*0.08,iw,ih);
+    var BH=box[3]-box[1],cx=(box[0]+box[2])/2;
+    /* 2 · two tiles so the models see the athlete bigger: head and chest (square), then the rest of the body */
+    var uh=BH*0.52,us=Math.max(uh,Math.min(box[2]-box[0],uh*1.15));
+    var up=clampRect(cx-us/2,box[1],cx+us/2,box[1]+uh,iw,ih);
+    var lo=[box[0],box[1]+BH*0.4,box[2],box[3]];
+    var pl=segPerson(segs.body,canvasOf(src,lo[0],lo[1],lo[2]-lo[0],lo[3]-lo[1],720));
+    var uc=canvasOf(src,up[0],up[1],up[2]-up[0],up[3]-up[1],720),pud=segPerson(segs.body,uc),pus=null;
+    if(segs.head){try{pus=segPerson(segs.head,uc);}catch(e){pus=null;}}
+    /* 3 · stitch the tiles in the cut mask's own grid */
+    var W=C.MW,H=C.MH,kx=W/iw,ky=H/ih;
+    var rx=Math.max(0,Math.floor(Math.min(up[0],lo[0])*kx)),ry=Math.max(0,Math.floor(box[1]*ky));
+    var rw=Math.min(W,Math.ceil(Math.max(up[2],lo[2])*kx))-rx,rh=Math.min(H,Math.ceil(box[3]*ky))-ry;
     if(rw<4||rh<4)return 'none';
-    var p=resampleProb(p2,rw,rh),I=new Float32Array(rw*rh),i,pix=C.pix,d=C.img.data;
-    for(y=0;y<rh;y++)for(x=0;x<rw;x++){var q=((ry+y)*W+rx+x)*4;I[y*rw+x]=(pix[q]*0.299+pix[q+1]*0.587+pix[q+2]*0.114)/255;}
-    var rad=Math.max(2,Math.round(Math.max(rw,rh)/90)),gq=guidedFilter(I,p,rw,rh,rad,0.0012);
-    C.undo.push(new Uint8ClampedArray(d));if(C.undo.length>8)C.undo.shift();
+    var P=new Float32Array(rw*rh),Wt=new Float32Array(rw*rh);
+    function paste(prob,rect,weight){
+      var tx=Math.round(rect[0]*kx)-rx,ty=Math.round(rect[1]*ky)-ry,tw=Math.max(1,Math.round((rect[2]-rect[0])*kx)),th=Math.max(1,Math.round((rect[3]-rect[1])*ky));
+      var a=resampleProb(prob,tw,th);
+      for(var yy=0;yy<th;yy++){var Y=ty+yy;if(Y<0||Y>=rh)continue;var wy=weight(yy/th);
+        for(var xx=0;xx<tw;xx++){var X=tx+xx;if(X<0||X>=rw)continue;var k=Y*rw+X;P[k]+=a[yy*tw+xx]*wy;Wt[k]+=wy;}}
+    }
+    var ov0=(lo[1]-up[1])/(up[3]-up[1]);           /* where the lower tile starts, inside the upper tile */
+    var upper=pud;
+    if(pus){
+      var ra=resampleProb(pud,pus.w,pus.h),sa=orientLike(pus.a,ra),mix=new Float32Array(sa.length);
+      for(i=0;i<sa.length;i++)mix[i]=0.7*sa[i]+0.3*ra[i];
+      upper={w:pus.w,h:pus.h,a:mix};
+    }
+    paste(upper,up,function(t){return t<ov0?1:Math.max(0.02,1-(t-ov0)/(1-ov0));});
+    paste(pl,lo,function(t){var ot=(up[3]-lo[1])/(lo[3]-lo[1]);return t>ot?1:Math.max(0.02,t/ot);});
+    for(i=0;i<P.length;i++)P[i]=Wt[i]>0?P[i]/Wt[i]:0;
+    /* 4 · refine the edge with the photo's colours, then tighten it so the background never covers the numbers */
+    var Rr=new Float32Array(rw*rh),Gg=new Float32Array(rw*rh),Bb=new Float32Array(rw*rh),pix=C.pix,d=C.img.data;
+    for(y=0;y<rh;y++)for(x=0;x<rw;x++){var q=((ry+y)*W+rx+x)*4,k2=y*rw+x;Rr[k2]=pix[q]/255;Gg[k2]=pix[q+1]/255;Bb[k2]=pix[q+2]/255;}
+    var rad=Math.max(2,Math.round(Math.max(rw,rh)/110)),gq=guidedFilterRGB(Rr,Gg,Bb,P,rw,rh,rad,0.0006);
+    C.undo.push(cutAlpha());if(C.undo.length>8)C.undo.shift();
     for(i=3;i<d.length;i+=4)d[i]=0;
     var any=false;
     for(y=0;y<rh;y++)for(x=0;x<rw;x++){
-      var v=gq[y*rw+x],t=Math.max(0,Math.min(1,(v-0.38)/0.24)),al=Math.round(t*t*(3-2*t)*255);
+      var v=gq[y*rw+x],tt=Math.max(0,Math.min(1,(v-0.45)/0.2)),al=Math.round(tt*tt*(3-2*tt)*255);
       if(al>0){d[((ry+y)*W+rx+x)*4+3]=al;any=true;}
     }
     C.ctx.putImageData(C.img,0,0);C.dirty=true;cutBBox();
@@ -2486,8 +2540,7 @@ function autoCut(){
   },function(err){
     autoBusy=false;$('cutStart').disabled=false;setBusy(null);updateCutBar();
     try{console.warn('autocut',err);}catch(e){}
-    var inClaude=!!window.claude;
-    enterCut(!inClaude?'Não consegui recortar sozinho agora. Confira a internet ou marque com o pincel.':'O recorte automático funciona no site podio-post.vercel.app. Aqui, use o pincel.');
+    enterCut(!window.claude?'Não consegui recortar sozinho agora. Confira a internet ou marque com o pincel.':'O recorte automático funciona no site podio-post.vercel.app. Aqui, use o pincel.');
   });
 }
 
