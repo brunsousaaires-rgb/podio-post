@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <title>Pódio Post · seu treino pronto para o Instagram</title>
 <meta name="description" content="Monte o story ou o post do seu treino de corrida, ciclismo, HYROX ou CrossFit: foto, mapa do percurso do Strava, números do treino, logo e dicas de pose e música.">
 <meta name="theme-color" content="#F3F4F7">
@@ -62,8 +62,8 @@
 }
 @supports (height:1svh){:root{--vh:1svh}}
 *{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.45;overflow:hidden;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+html,body{height:100%;overscroll-behavior:none}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.45;overflow:hidden;touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
 .vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -75,7 +75,7 @@ button{font:inherit;color:inherit}
 .scrim{position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(18,26,35,.3) 0%,rgba(18,26,35,.62) 50%,rgba(18,26,35,.9) 100%)}
 
 /* ---------- screens ---------- */
-.screen,.app{position:fixed;inset:0;z-index:1}
+.screen,.app{position:fixed;inset:0;z-index:1;max-width:100vw}
 body[data-screen="home"] #pick,body[data-screen="home"] #app,
 body[data-screen="pick"] #home,body[data-screen="pick"] #app,
 body[data-screen="editor"] #home,body[data-screen="editor"] #pick{display:none}
@@ -102,10 +102,10 @@ body[data-screen="editor"] #home,body[data-screen="editor"] #pick{display:none}
 .save:disabled{opacity:.6;cursor:progress}
 
 /* ---------- home ---------- */
-.home{display:flex;flex-direction:column;overflow-y:auto;padding-top:env(safe-area-inset-top,0px)}
+.home{display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;padding-top:env(safe-area-inset-top,0px)}
 .home>*{width:100%;max-width:560px;margin-inline:auto}
 .h-top{display:flex;align-items:center;justify-content:space-between;padding-block:16px 0}
-.h-cards{position:relative;flex:1 1 0;min-height:190px;max-height:460px;margin-top:6px}
+.h-cards{position:relative;flex:1 1 0;min-height:190px;max-height:460px;margin-top:6px;overflow-x:clip}
 .hc{position:absolute;left:50%;top:50%;height:90%;width:auto;border-radius:16px;box-shadow:0 30px 60px -22px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.1)}
 .hc.c1{transform:translate(-50%,-50%);z-index:2}
 .hc.c2{transform:translate(-112%,-47%) rotate(-8deg) scale(.84);opacity:.9}
@@ -132,7 +132,7 @@ body[data-screen="editor"] #home,body[data-screen="editor"] #pick{display:none}
 .bar-title h1{margin:0;font-weight:800;font-size:20px;line-height:1.15}
 .bar-title p{margin:2px 0 0;color:var(--muted);font-size:13px}
 .step{flex:none;padding:6px 11px;border-radius:999px;background:var(--glass);border:1px solid var(--line);color:var(--text-2);font-weight:700;font-size:12px}
-.pick-scroll{flex:1;overflow-y:auto;padding-bottom:max(28px,env(safe-area-inset-bottom,0px));-webkit-overflow-scrolling:touch}
+.pick-scroll{flex:1;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;padding-bottom:max(28px,env(safe-area-inset-bottom,0px));-webkit-overflow-scrolling:touch}
 .pick-inner{max-width:1100px;margin-inline:auto}
 .mgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 14px;margin-top:18px}
 .mcard{position:relative;display:flex;flex-direction:column;cursor:pointer}
@@ -213,7 +213,7 @@ button.row:disabled{opacity:.6;cursor:progress}
 .dims{display:none;position:absolute;left:max(20px,env(safe-area-inset-left,0px));bottom:16px;color:var(--muted);font-weight:600;font-size:12px;pointer-events:none}
 
 /* ---------- tool sheet ---------- */
-.panel{grid-area:panel;position:relative;height:clamp(240px,calc(40 * var(--vh)),390px);overflow-y:auto;overscroll-behavior:contain;background:rgba(24,34,45,.8);border-top:1px solid var(--line);border-radius:26px 26px 0 0;transition:height .28s ease;-webkit-backdrop-filter:blur(24px) saturate(1.3);backdrop-filter:blur(24px) saturate(1.3)}
+.panel{grid-area:panel;position:relative;height:clamp(240px,calc(40 * var(--vh)),390px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;background:rgba(24,34,45,.8);border-top:1px solid var(--line);border-radius:26px 26px 0 0;transition:height .28s ease;-webkit-backdrop-filter:blur(24px) saturate(1.3);backdrop-filter:blur(24px) saturate(1.3)}
 .app.collapsed .panel{height:0;border-top-color:transparent}
 .grab{position:sticky;top:0;z-index:3;display:block;width:100%;height:24px;margin-bottom:-4px;border:0;background:transparent;cursor:pointer}
 .grab::before{content:"";display:block;width:40px;height:5px;margin:9px auto 0;border-radius:3px;background:var(--line-2)}
@@ -2844,7 +2844,9 @@ view.addEventListener('wheel',function(e){
   if(!S.photo)return;e.preventDefault();hideHint();
   zoomAt(Math.exp(-dy*(e.ctrlKey?0.01:0.0015)),pc);constrain(false);schedule();
 },{passive:false});
-['gesturestart','gesturechange'].forEach(function(t){view.addEventListener(t,function(e){e.preventDefault();});});
+['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();},{passive:false});});
+/* the screens only ever scroll up and down, like an app */
+document.querySelectorAll('.home,.pick-scroll,.panel').forEach(function(el){el.addEventListener('scroll',function(){if(el.scrollLeft)el.scrollLeft=0;},{passive:true});});
 view.addEventListener('keydown',function(e){
   var step=e.shiftKey?60:15,used=true,c=curItem();
   if(c){
