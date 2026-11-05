@@ -694,7 +694,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radiu
           <button class="row ind" type="button" id="unlockBtn" aria-expanded="false" aria-controls="codeForm"><span class="tile lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span class="grow"><b>Adicionar outra logo</b><small>Liberado com código de acesso</small></span><span class="pill">Código</span></button>
           <form class="row codeform" id="codeForm" autocomplete="off" hidden><input id="codeIn" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Código de 6 dígitos" aria-label="Código de acesso" aria-describedby="codeErr" enterkeyhint="done"><button class="btn-s" type="submit">Liberar</button></form>
           <label class="row ind upload" for="logoIn" id="logoUpRow" hidden><span class="tile l" aria-hidden="true">L</span><span class="grow"><b>Arquivo da logo extra</b><small id="logoName">PNG com fundo transparente</small></span><span class="pill" id="logoUpPill">Enviar</span><input class="vh" type="file" id="logoIn" accept="image/png,image/webp,image/svg+xml,image/*"></label>
-          <label class="row toggle" id="extraOnRow" hidden><span class="grow"><b>Mostrar a logo extra</b><small>Entra junto com a logo principal</small></span><input class="vh" type="checkbox" id="extraOn" checked><span class="sw-ui" aria-hidden="true"></span></label>
+          <label class="row toggle" id="extraOnRow" hidden><span class="grow"><b>Mostrar a logo extra</b><small>Entra junto com a logo principal</small></span><input class="vh" type="checkbox" id="extraOn"><span class="sw-ui" aria-hidden="true"></span></label>
           <label class="row toggle" id="extraWhiteRow" hidden><span class="grow"><b>Logo extra branca</b><small>Para aparecer em fotos escuras</small></span><input class="vh" type="checkbox" id="extraWhite"><span class="sw-ui" aria-hidden="true"></span></label>
         </div>
         <p class="error" id="codeErr" role="alert" hidden>Código incorreto. Confira o código que você recebeu.</p>
@@ -789,7 +789,7 @@ var STYLE_DESC={
   retro:'Mapa de fase de jogo antigo, com um nível a cada quilômetro.'
 };
 
-var S={sport:'corrida',template:'percurso',mapStyle:'linha',pixel:true,showData:true,showLogo:true,quality:'max',cutOn:false,cutErase:false,cutSize:64,cutEdge:0,font:'padrao',logoVar:'full-branco',raceLogo:true,raceSpons:true,raceFrame:true,showExtra:true,extraWhite:false,grad:{on:false,color:'#000000',alpha:80,start:0,end:45},tf:{},hidden:{},sel:null,mapWas:null,format:'story',accent:'#E9B949',darken:0,zoom:100,ox:0,oy:0,
+var S={sport:'corrida',template:'percurso',mapStyle:'linha',pixel:true,showData:true,showLogo:true,quality:'max',cutOn:false,cutErase:false,cutSize:64,cutEdge:0,font:'padrao',logoVar:'full-branco',raceLogo:true,raceSpons:true,raceFrame:true,showExtra:false,extraWhite:false,grad:{on:false,color:'#000000',alpha:80,start:0,end:45},tf:{},hidden:{},sel:null,mapWas:null,format:'story',accent:'#E9B949',darken:0,zoom:100,ox:0,oy:0,
   showMap:true,sign:true,guides:true,photo:null,photoSample:true,route:null,routeSample:true,dataSample:true,
   title:'',date:fmtDate(new Date()),dist:'',time:'',elev:'',detail:'',match:null};
 S.match=sampleMatch();
@@ -2306,7 +2306,7 @@ function setCustomLogo(src,name,opt){
     logoImg=c;logoVer++;$('logoName').textContent=name;$('logoUpPill').textContent='Trocar';
     if(opt.save){try{localStorage.setItem('podio.logo',c.toDataURL('image/png'));localStorage.setItem('podio.logoName',name);}catch(err){}}
     buildLogoPicks();showLogoUnlock();
-    if(opt.save){S.showExtra=true;$('extraOn').checked=true;toast('Logo extra adicionada');}
+    if(opt.save){toast('Logo salva. Ligue “Mostrar a logo extra” para usar');}
     schedule();
   };
   img.onerror=function(){if(opt.revoke)URL.revokeObjectURL(src);if(opt.save)toast('Não consegui abrir esse arquivo de logo');else{store('podio.logo',null);}};
@@ -2419,7 +2419,7 @@ function navBack(name){
 }
 window.addEventListener('popstate',function(e){var s=e.state&&e.state.s;if(s&&DEPTH[s]!=null)go(s);});
 /*HOME-EMBED-START*/
-var HOME_EMBED={"hyrox":{"photo":"/home/hyrox.jpg","mask":"/home/hyrox-mask.png","bbox":[0.1365,0.1034,0.8176,1.0]},"corrida":{"photo":"/home/corrida.jpg","mask":"/home/corrida-mask.png","bbox":[0.2766,0.2375,0.7246,0.9554]},"futebol":{"photo":"/home/futebol.jpg","mask":"/home/futebol-mask.png","bbox":[0.0435,0.212,0.9928,0.8362]}};
+var HOME_EMBED={"hyrox":{"photo":"/home/hyrox.jpg","mask":"/home/hyrox-mask.png","bbox":[0.1365,0.1034,0.8176,1.0]},"corrida":{"photo":"/home/corrida.jpg","mask":"/home/corrida-mask.png","bbox":[0.2766,0.2375,0.7246,0.9554]},"futebol":{"photo":"/home/futebol.jpg","mask":"/home/futebol-mask.png","bbox":[0.0435,0.2112,0.994,0.8362]}};
 /*HOME-EMBED-END*/
 var HOME_CARDS={
   corrida:{sport:'corrida',layout:'discreto',style:'linha',cut:true,place:{title:{s:0.72,at:'bl'},map:{s:0.8,at:'br'}}},
