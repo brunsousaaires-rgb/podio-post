@@ -318,6 +318,14 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radiu
 .lg input:checked + .lg-img{box-shadow:0 0 0 2px var(--bg-2),0 0 0 4px var(--accent)}
 .lg input:focus-visible + .lg-img{outline:2px solid #fff;outline-offset:6px}
 .lg .tag{position:absolute;top:5px;left:5px;padding:1px 6px;border-radius:999px;background:var(--accent);color:#fff;font-weight:700;font-size:9.5px;line-height:1.5}
+#notifSec .field input{text-align:left}
+#notifSec .logos{padding:14px 2px 10px}
+button.lg{appearance:none;-webkit-appearance:none;border:0;background:none;padding:0;margin:0;color:inherit;font:inherit;text-align:center}
+button.lg[aria-pressed="true"] .lg-img{box-shadow:0 0 0 2px var(--bg-2),0 0 0 4px var(--accent)}
+button.lg:focus-visible .lg-img{outline:2px solid #fff;outline-offset:6px}
+.lg .nlab{display:block;margin-top:6px;font-size:11.5px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+button.lg[aria-pressed="true"] .nlab{color:var(--text)}
+.lg-img .nplus{font:600 30px/1 var(--body);color:var(--text-2)}
 .lmenu .logos{display:flex;gap:8px;overflow-x:auto;padding:2px 6px 8px;scrollbar-width:none}
 .lmenu .logos::-webkit-scrollbar{display:none}
 .lmenu .lg{flex:none;width:54px}
@@ -466,6 +474,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radiu
         <div class="mcard" data-sport="futebol" hidden><input class="vh" type="radio" name="tpl" id="t-placar" value="placar" aria-label="TV"><span class="m-img"><canvas data-layout="placar" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="placar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">TV</span><span class="m-desc">Placar de transmissão no alto, como no jogo da TV</span></div>
         <div class="mcard" data-sport="futebol" hidden><input class="vh" type="radio" name="tpl" id="t-telao" value="telao" aria-label="Telão"><span class="m-img"><canvas data-layout="telao" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="telao"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Telão</span><span class="m-desc">Placar de estádio embaixo, com os escudos</span></div>
         <div class="mcard" data-sport="futebol" hidden><input class="vh" type="radio" name="tpl" id="t-golgig" value="golgig" aria-label="Gigante"><span class="m-img"><canvas data-layout="golgig" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="golgig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Gigante</span><span class="m-desc">O placar enorme atrás dos jogadores</span></div>
+        <div class="mcard" data-sport="todos"><input class="vh" type="radio" name="tpl" id="t-notif" value="notif" aria-label="Notificação"><span class="m-img"><canvas data-layout="notif" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="notif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Notificação</span><span class="m-desc">Os números numa notificação de vidro, como a do iPhone</span></div>
       </div>
     </div>
   </div>
@@ -609,6 +618,21 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radiu
         </div>
         <p class="error" id="mediaError" hidden></p>
         <p class="note">Com o GPX, distância, tempo, elevação e data entram sozinhos. No Strava, abra a atividade pelo navegador, toque nos três pontos e escolha Exportar GPX.</p>
+      </div>
+      <div class="sec" id="notifSec" hidden>
+        <div class="sec-head"><span class="eyebrow" id="lbl-notif">Notificação</span><button class="link" id="nAuto" type="button" hidden>Voltar ao texto automático</button></div>
+        <div class="group">
+          <label class="row field" for="nApp"><span class="fl">Nome</span><input id="nApp" type="text" maxlength="18" placeholder="Pódio" autocomplete="off"><span class="unit"></span></label>
+          <label class="row field" for="nTitle"><span class="fl">Título</span><input id="nTitle" type="text" maxlength="48" autocomplete="off"><span class="unit"></span></label>
+          <label class="row field" for="nBody"><span class="fl">Texto</span><input id="nBody" type="text" maxlength="120" autocomplete="off"><span class="unit"></span></label>
+        </div>
+        <div class="logos" id="nIcons" role="group" aria-label="Ícone da notificação"></div>
+        <input class="vh" type="file" id="nIconIn" accept="image/*">
+        <div class="segmented" role="radiogroup" aria-label="Vidro da notificação">
+          <label><input class="vh" type="radio" name="nGlass" value="escuro" checked><span>Vidro escuro</span></label>
+          <label><input class="vh" type="radio" name="nGlass" value="claro"><span>Vidro claro</span></label>
+        </div>
+        <p class="note">O texto sai dos números do treino. Mude se quiser: o app guarda o seu.</p>
       </div>
       <div class="sec">
         <div class="sec-head"><span class="eyebrow">Números</span></div>
@@ -778,7 +802,8 @@ var TPL_DESC={
   tv:'Placar de transmissão esportiva, como no fim de uma prova na TV.',
   placar:'Placar de TV no alto, como na transmissão do jogo.',
   telao:'Telão de estádio embaixo, com os escudos dos times e o placar grande.',
-  golgig:'O placar em números gigantes, atrás dos jogadores.'
+  golgig:'O placar em números gigantes, atrás dos jogadores.',
+  notif:'Os números numa notificação de vidro, como a do iPhone.'
 };
 var STYLE_DESC={
   linha:'O traçado do percurso com brilho, na cor que você escolher.',
@@ -789,7 +814,7 @@ var STYLE_DESC={
   retro:'Mapa de fase de jogo antigo, com um nível a cada quilômetro.'
 };
 
-var S={sport:'corrida',template:'percurso',mapStyle:'linha',pixel:true,showData:true,showLogo:true,quality:'max',cutOn:false,cutErase:false,cutSize:64,cutEdge:0,font:'padrao',logoVar:'full-branco',raceLogo:true,raceSpons:true,raceFrame:true,showExtra:false,extraWhite:false,grad:{on:false,color:'#000000',alpha:80,start:0,end:45},tf:{},hidden:{},sel:null,mapWas:null,format:'story',accent:'#E9B949',darken:0,zoom:100,ox:0,oy:0,
+var S={sport:'corrida',template:'percurso',mapStyle:'linha',pixel:true,showData:true,showLogo:true,quality:'max',cutOn:false,cutErase:false,cutSize:64,cutEdge:0,font:'padrao',logoVar:'full-branco',raceLogo:true,raceSpons:true,raceFrame:true,showExtra:false,notif:{app:'Pódio',icon:'podio',glass:'escuro',title:null,body:null},extraWhite:false,grad:{on:false,color:'#000000',alpha:80,start:0,end:45},tf:{},hidden:{},sel:null,mapWas:null,format:'story',accent:'#E9B949',darken:0,zoom:100,ox:0,oy:0,
   showMap:true,sign:true,guides:true,photo:null,photoSample:true,route:null,routeSample:true,dataSample:true,
   title:'',date:fmtDate(new Date()),dist:'',time:'',elev:'',detail:'',match:null};
 S.match=sampleMatch();
@@ -1343,7 +1368,7 @@ function logoSource(){return sourceFor(varById(S.logoVar))||document.createEleme
 
 /* logo version pickers: one in Estilo, a compact one inside the L menu */
 function drawLogoPicks(){
-  document.querySelectorAll('.lg canvas').forEach(function(c){
+  document.querySelectorAll('.lg canvas[data-var]').forEach(function(c){
     var v=varById(c.getAttribute('data-var')),src=sourceFor(v),g=c.getContext('2d'),w=c.width,h=c.height;
     g.clearRect(0,0,w,h);if(!src)return;var d=sizeOf(src),k=Math.min(w/d[0],h/d[1]);
     g.drawImage(src,(w-d[0]*k)/2,(h-d[1]*k)/2,d[0]*k,d[1]*k);
@@ -1752,6 +1777,175 @@ DRAW.xlogo=function(ctx,it){
   ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=16*SHK;ctx.shadowOffsetY=2*SHK;
   ctx.drawImage(src,0,0,it.w,it.h);noShadow(ctx);
 };
+/* ---------- Notificação: the workout or the score inside an iPhone-style glass notification ---------- */
+var NB={P:40,IC:118,GAP:32,TH:120,R:62,LH:52},nIconVer=0,NICON_IMG=null;
+var NICON_ORDER=['podio','cronometro','trofeu','bike','halter','bola','foto'];
+var NICON_NAME={podio:'Pódio',cronometro:'Cronômetro',trofeu:'Troféu',bike:'Bike',halter:'Halter',bola:'Bola',foto:'Sua imagem'};
+var NM=document.createElement('canvas').getContext('2d');
+F.body=function(w,s){return w+' '+s+'px Manrope,system-ui,-apple-system,"Segoe UI",sans-serif';};
+function notifAuto(){
+  var d=num(S.dist),t=secs(S.time),e=Math.round(num(S.elev)),T=S.title.trim(),time=t?fmtT(t):'',det=S.detail.trim(),sp=S.sport;
+  if(sp==='futebol'){
+    var M=S.match||{},A=(M.a||'Casa').trim()||'Casa',B=(M.b||'Visitante').trim()||'Visitante',ga=+M.ga||0,gb=+M.gb||0,ck=(M.clock||'').trim();
+    var res=ga>gb?'Vitória do '+A+'!':gb>ga?'Vitória do '+B+'!':'Empate!';
+    return {title:'Fim de jogo: '+A+' '+ga+' × '+gb+' '+B,body:[T,ck].filter(Boolean).join(' · ')+(T||ck?'. ':'')+res};
+  }
+  if(sp==='corrida'||sp==='ciclismo'){
+    var run=sp==='corrida',km=d?dec(d,run?2:1):'',what=run?'Treino':'Pedal';
+    var tail=run?(d&&t?', ritmo de '+fmtT(t/d)+'/km':''):(d&&t?', média de '+dec(d/(t/3600),1)+' km/h':'');
+    var el=e>0?' e '+e+' m de '+(run?'elevação':'subida'):'';
+    return {title:what+' concluído'+(km?' · '+km+' km':time?' · '+time:''),body:(T||what)+(time?' em '+time:'')+tail+el+'.'};
+  }
+  if(sp==='hyrox')return {title:(T||'HYROX')+(time?' · '+time:''),body:(det?det+'. ':'')+'Prova feita!'};
+  return {title:(T||'WOD')+(time?' · '+time:''),body:(det?det+'. ':'')+'WOD concluído!'};
+}
+function notifText(){
+  var a=notifAuto(),n=S.notif;
+  return {app:(n.app||'').trim()||'Pódio',when:'agora',
+    title:n.title!=null&&n.title.trim()?n.title.trim():a.title,body:n.body!=null&&n.body.trim()?n.body.trim():a.body};
+}
+function notifThumb(){return hasRoute();}
+function notifWrap(ctx,text,maxW,maxLines){
+  var words=text.split(/\s+/),lines=[],cur='';
+  words.forEach(function(w){var t=cur?cur+' '+w:w;if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w;}else cur=t;});
+  if(cur)lines.push(cur);
+  if(lines.length>maxLines){lines.length=maxLines;var l=lines[maxLines-1];while(l.length>1&&ctx.measureText(l+'…').width>maxW)l=l.slice(0,-1);lines[maxLines-1]=l.replace(/[\s,·.]+$/,'')+'…';}
+  return lines;
+}
+function notifTextW(w){return w-NB.P*2-NB.IC-NB.GAP-(notifThumb()?NB.TH+26:0);}
+function notifLines(w){NM.font=F.body(600,41);return notifWrap(NM,notifText().body,notifTextW(w),3);}
+function notifHeight(w){return NB.P*2+158+NB.LH*(Math.max(1,notifLines(w).length)-1);}
+/* the app's own icons */
+var NICONS={
+  podio:function(ctx,s){var g=ctx.createLinearGradient(0,0,0,s);g.addColorStop(0,'#FF8A3D');g.addColorStop(1,'#E8521A');ctx.fillStyle=g;rr(ctx,0,0,s,s,s*0.23);ctx.fill();
+    var f=s*0.5,o=(s-f)/2,t=f/4,i,j;ctx.save();rr(ctx,o,o,f,f,f*0.24);ctx.clip();ctx.fillStyle='#fff';ctx.fillRect(o,o,f,f);ctx.fillStyle='#E8521A';
+    for(i=0;i<4;i++)for(j=0;j<4;j++)if((i+j)%2)ctx.fillRect(o+i*t,o+j*t,t+0.5,t+0.5);ctx.restore();ctx.lineWidth=f*0.09;ctx.strokeStyle='#fff';rr(ctx,o,o,f,f,f*0.24);ctx.stroke();},
+  cronometro:function(ctx,s){var g=ctx.createLinearGradient(0,0,0,s);g.addColorStop(0,'#5B7CFF');g.addColorStop(1,'#2F4FE0');ctx.fillStyle=g;rr(ctx,0,0,s,s,s*0.23);ctx.fill();
+    var cx=s/2,cy=s*0.56,r=s*0.26;ctx.strokeStyle='#fff';ctx.lineWidth=s*0.07;ctx.lineCap='round';ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+r*0.45,cy-r*0.5);ctx.stroke();ctx.beginPath();ctx.moveTo(cx-s*0.08,s*0.17);ctx.lineTo(cx+s*0.08,s*0.17);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx,s*0.17);ctx.lineTo(cx,cy-r);ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy,s*0.04,0,Math.PI*2);ctx.fill();},
+  trofeu:function(ctx,s){var g=ctx.createLinearGradient(0,0,0,s);g.addColorStop(0,'#F4CD57');g.addColorStop(1,'#C8941A');ctx.fillStyle=g;rr(ctx,0,0,s,s,s*0.23);ctx.fill();
+    ctx.fillStyle='#fff';ctx.strokeStyle='#fff';ctx.lineWidth=s*0.05;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(s*0.32,s*0.22);ctx.lineTo(s*0.68,s*0.22);ctx.lineTo(s*0.66,s*0.44);ctx.quadraticCurveTo(s*0.63,s*0.6,s*0.5,s*0.61);ctx.quadraticCurveTo(s*0.37,s*0.6,s*0.34,s*0.44);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.arc(s*0.32,s*0.33,s*0.075,Math.PI*0.5,Math.PI*1.5);ctx.stroke();ctx.beginPath();ctx.arc(s*0.68,s*0.33,s*0.075,Math.PI*1.5,Math.PI*0.5);ctx.stroke();
+    ctx.fillRect(s*0.465,s*0.6,s*0.07,s*0.12);rr(ctx,s*0.35,s*0.71,s*0.3,s*0.08,s*0.025);ctx.fill();},
+  bike:function(ctx,s){var g=ctx.createLinearGradient(0,0,0,s);g.addColorStop(0,'#C6F75A');g.addColorStop(1,'#86C51A');ctx.fillStyle=g;rr(ctx,0,0,s,s,s*0.23);ctx.fill();
+    ctx.strokeStyle='#14202B';ctx.lineWidth=s*0.05;ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.beginPath();ctx.arc(s*0.29,s*0.62,s*0.15,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.arc(s*0.71,s*0.62,s*0.15,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(s*0.29,s*0.62);ctx.lineTo(s*0.47,s*0.62);ctx.lineTo(s*0.41,s*0.38);ctx.lineTo(s*0.62,s*0.4);ctx.lineTo(s*0.47,s*0.62);
+    ctx.moveTo(s*0.41,s*0.38);ctx.lineTo(s*0.29,s*0.62);ctx.moveTo(s*0.62,s*0.4);ctx.lineTo(s*0.71,s*0.62);ctx.moveTo(s*0.6,s*0.32);ctx.lineTo(s*0.68,s*0.32);ctx.moveTo(s*0.36,s*0.33);ctx.lineTo(s*0.46,s*0.33);ctx.stroke();},
+  halter:function(ctx,s){var g=ctx.createLinearGradient(0,0,0,s);g.addColorStop(0,'#FF6A5E');g.addColorStop(1,'#DE3328');ctx.fillStyle=g;rr(ctx,0,0,s,s,s*0.23);ctx.fill();
+    ctx.fillStyle='#fff';ctx.fillRect(s*0.3,s*0.47,s*0.4,s*0.06);
+    rr(ctx,s*0.2,s*0.31,s*0.09,s*0.38,s*0.03);ctx.fill();rr(ctx,s*0.71,s*0.31,s*0.09,s*0.38,s*0.03);ctx.fill();
+    rr(ctx,s*0.13,s*0.38,s*0.06,s*0.24,s*0.025);ctx.fill();rr(ctx,s*0.81,s*0.38,s*0.06,s*0.24,s*0.025);ctx.fill();},
+  bola:function(ctx,s){var g=ctx.createLinearGradient(0,0,s,s);g.addColorStop(0,'#1E2A3A');g.addColorStop(1,'#0B1017');ctx.fillStyle=g;rr(ctx,0,0,s,s,s*0.23);ctx.fill();
+    var cx=s/2,cy=s/2,r=s*0.3,i;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();ctx.fillStyle='#0B1017';
+    function pent(px,py,pr,rot){ctx.beginPath();for(var k=0;k<5;k++){var a=rot+k*Math.PI*2/5;ctx.lineTo(px+Math.cos(a)*pr,py+Math.sin(a)*pr);}ctx.closePath();ctx.fill();}
+    pent(cx,cy,r*0.36,-Math.PI/2);for(i=0;i<5;i++){var a=-Math.PI/2+i*Math.PI*2/5;pent(cx+Math.cos(a)*r*0.98,cy+Math.sin(a)*r*0.98,r*0.34,a+Math.PI/2);}
+    ctx.strokeStyle='#0B1017';ctx.lineWidth=s*0.018;for(i=0;i<5;i++){var b=-Math.PI/2+i*Math.PI*2/5;ctx.beginPath();ctx.moveTo(cx+Math.cos(b)*r*0.36,cy+Math.sin(b)*r*0.36);ctx.lineTo(cx+Math.cos(b)*r*0.7,cy+Math.sin(b)*r*0.7);ctx.stroke();}ctx.restore();},
+  foto:function(ctx,s){var im=NICON_IMG;if(!(im&&im.complete&&im.naturalWidth)){NICONS.podio(ctx,s);return;}
+    ctx.save();rr(ctx,0,0,s,s,s*0.23);ctx.clip();var iw=im.naturalWidth,ih=im.naturalHeight,k=Math.max(s/iw,s/ih);ctx.drawImage(im,(s-iw*k)/2,(s-ih*k)/2,iw*k,ih*k);ctx.restore();}
+};
+function notifIcon(){var i=S.notif.icon;return NICONS[i]&&(i!=='foto'||NICON_IMG)?i:'podio';}
+/* blur of what is under the card: shrink, then grow again (the same on every phone) */
+var NF1=document.createElement('canvas'),NF2=document.createElement('canvas');
+function frostOf(src,x,y,w,h){
+  var sw=46,sh=Math.max(4,Math.round(sw*h/w));NF1.width=sw;NF1.height=sh;var g=NF1.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+  var mx=w*0.08,my=h*0.08;g.drawImage(src,Math.max(0,x-mx),Math.max(0,y-my),w+2*mx,h+2*my,0,0,sw,sh);
+  NF2.width=sw*4;NF2.height=sh*4;var g2=NF2.getContext('2d');g2.imageSmoothingEnabled=true;g2.imageSmoothingQuality='high';g2.drawImage(NF1,0,0,NF2.width,NF2.height);
+  return NF2;
+}
+function drawGlass(ctx,it,t){
+  var w=it.w,h=it.h,R=Math.min(NB.R,h/2),cv=ctx.canvas;
+  ctx.save();ctx.translate(t.x,t.y);ctx.rotate(t.r);ctx.scale(t.s,t.s);
+  var M=ctx.getTransform(),sc=Math.hypot(M.a,M.b),xs=[],ys=[];
+  [[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]].forEach(function(p){xs.push(M.a*p[0]+M.c*p[1]+M.e);ys.push(M.b*p[0]+M.d*p[1]+M.f);});
+  var bx=Math.max(0,Math.floor(Math.min.apply(null,xs))),by=Math.max(0,Math.floor(Math.min.apply(null,ys)));
+  var bw=Math.min(cv.width,Math.ceil(Math.max.apply(null,xs)))-bx,bh=Math.min(cv.height,Math.ceil(Math.max.apply(null,ys)))-by;
+  if(bw<4||bh<4){ctx.restore();return;}
+  var fr=frostOf(cv,bx,by,bw,bh),light=S.notif.glass==='claro';
+  ctx.save();ctx.shadowColor='rgba(0,0,0,'+(light?.22:.3)+')';ctx.shadowBlur=60*sc;ctx.shadowOffsetY=18*sc;rr(ctx,-w/2,-h/2,w,h,R);ctx.fillStyle='rgba(0,0,0,.2)';ctx.fill();ctx.restore();
+  rr(ctx,-w/2,-h/2,w,h,R);ctx.clip();ctx.setTransform(1,0,0,1,0,0);
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(fr,bx,by,bw,bh);
+  ctx.restore();
+}
+DRAW.notif=function(ctx,it){
+  var w=it.w,h=it.h,R=Math.min(NB.R,h/2),light=S.notif.glass==='claro',T=notifText(),P=NB.P,th=notifThumb()?NB.TH:0,tw=notifTextW(w),tx=P+NB.IC+NB.GAP;
+  ctx.save();rr(ctx,0,0,w,h,R);ctx.clip();
+  ctx.fillStyle=light?'rgba(255,255,255,.55)':'rgba(28,28,32,.46)';ctx.fillRect(0,0,w,h);
+  var sh=ctx.createLinearGradient(0,0,0,h);sh.addColorStop(0,light?'rgba(255,255,255,.35)':'rgba(255,255,255,.14)');sh.addColorStop(0.45,'rgba(255,255,255,0)');ctx.fillStyle=sh;ctx.fillRect(0,0,w,h);
+  ctx.restore();
+  rr(ctx,1.5,1.5,w-3,h-3,R-1);var rim=ctx.createLinearGradient(0,0,w*0.6,h);rim.addColorStop(0,'rgba(255,255,255,.55)');rim.addColorStop(0.4,'rgba(255,255,255,.12)');rim.addColorStop(1,'rgba(255,255,255,.28)');
+  ctx.strokeStyle=rim;ctx.lineWidth=3;ctx.stroke();
+  ctx.save();ctx.translate(P,(h-NB.IC)/2);NICONS[notifIcon()](ctx,NB.IC);ctx.restore();
+  var ink=light?'#111317':'#FFFFFF',soft=light?'rgba(17,19,23,.55)':'rgba(255,255,255,.62)';
+  resetText(ctx);
+  ctx.font=F.body(500,38);var whenW=ctx.measureText(T.when).width;ctx.fillStyle=soft;ctx.textAlign='right';ctx.fillText(T.when,w-P,P+38);ctx.textAlign='left';
+  ctx.fillStyle=ink;var app=fitText(ctx,T.app,F.body,700,42,w-P-whenW-24-tx,30);ctx.fillText(app,tx,P+38);
+  var title=fitText(ctx,T.title,F.body,800,43,tw,32);ctx.fillText(title,tx,P+98);
+  ctx.font=F.body(600,41);ctx.fillStyle=light?'rgba(17,19,23,.86)':'rgba(255,255,255,.9)';
+  notifWrap(ctx,T.body,tw,3).forEach(function(l,i){ctx.fillText(l,tx,P+150+i*NB.LH);});
+  if(th){
+    var ty=Math.max(P+50,(h-th)/2);ctx.save();ctx.translate(w-P-th,ty);
+    ctx.fillStyle=light?'rgba(17,19,23,.72)':'rgba(10,14,20,.55)';rr(ctx,0,0,th,th,th*0.2);ctx.fill();
+    ctx.translate(th*0.12,th*0.12);WIDGETS.linha(ctx,th*0.76,th*0.76);ctx.restore();resetText(ctx);
+  }
+};
+/* editor */
+function drawIconTile(c,id){var g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);NICONS[id](g,c.width);}
+function buildNotifIcons(){
+  var box=$('nIcons');box.textContent='';
+  NICON_ORDER.forEach(function(id){
+    var b=document.createElement('button'),im=document.createElement('span'),lb=document.createElement('span');
+    b.type='button';b.className='lg';b.setAttribute('data-ic',id);b.setAttribute('aria-pressed',notifIcon()===id&&(id!=='foto'||NICON_IMG)?'true':'false');
+    im.className='lg-img dk';lb.className='nlab';lb.textContent=NICON_NAME[id];
+    if(id==='foto'&&!NICON_IMG){var pl=document.createElement('span');pl.className='nplus';pl.textContent='+';im.appendChild(pl);}
+    else{var c=document.createElement('canvas');c.width=c.height=120;drawIconTile(c,id);im.appendChild(c);}
+    b.appendChild(im);b.appendChild(lb);
+    b.addEventListener('click',function(){
+      if(id==='foto'&&(!NICON_IMG||S.notif.icon==='foto')){$('nIconIn').click();return;}
+      S.notif.icon=id;saveNotif();buildNotifIcons();schedule();
+    });
+    box.appendChild(b);
+  });
+}
+function saveNotif(){store('podio.notif',JSON.stringify({app:S.notif.app,icon:S.notif.icon,glass:S.notif.glass}));}
+function syncNotifFields(){
+  if($('notifSec').hidden)return;
+  var a=notifAuto(),n=S.notif,ae=document.activeElement;
+  if(ae!==$('nApp'))$('nApp').value=n.app;
+  if(ae!==$('nTitle'))$('nTitle').value=n.title!=null?n.title:a.title;
+  if(ae!==$('nBody'))$('nBody').value=n.body!=null?n.body:a.body;
+  $('nAuto').hidden=n.title==null&&n.body==null;
+}
+function syncNotifUI(){
+  var on=S.template==='notif';$('notifSec').hidden=!on;if(!on)return;
+  document.querySelectorAll('input[name="nGlass"]').forEach(function(i){i.checked=i.value===S.notif.glass;});
+  syncNotifFields();
+}
+$('nApp').addEventListener('input',function(){S.notif.app=this.value;saveNotif();schedule();});
+$('nTitle').addEventListener('input',function(){S.notif.title=this.value;$('nAuto').hidden=false;schedule();});
+$('nBody').addEventListener('input',function(){S.notif.body=this.value;$('nAuto').hidden=false;schedule();});
+$('nAuto').addEventListener('click',function(){S.notif.title=null;S.notif.body=null;syncNotifFields();schedule();});
+document.querySelectorAll('input[name="nGlass"]').forEach(function(i){i.addEventListener('change',function(){S.notif.glass=i.value;saveNotif();schedule();});});
+function setNotifIconSrc(src,save){
+  var im=new Image();
+  im.onload=function(){
+    var c=document.createElement('canvas');c.width=c.height=256;var g=c.getContext('2d'),k=Math.max(256/im.naturalWidth,256/im.naturalHeight);
+    g.drawImage(im,(256-im.naturalWidth*k)/2,(256-im.naturalHeight*k)/2,im.naturalWidth*k,im.naturalHeight*k);
+    var url=c.toDataURL('image/png'),out=new Image();
+    out.onload=function(){NICON_IMG=out;nIconVer++;if(save){S.notif.icon='foto';saveNotif();store('podio.nicon',url);toast('Ícone trocado');}buildNotifIcons();schedule();scheduleThumbs();};
+    out.src=url;
+  };
+  im.onerror=function(){if(save)toast('Não consegui abrir essa imagem');};
+  im.src=src;
+}
+$('nIconIn').addEventListener('change',function(){var f=this.files&&this.files[0];if(f){var u=URL.createObjectURL(f);setNotifIconSrc(u,true);}this.value='';});
+(function(){
+  try{var o=JSON.parse(recall('podio.notif')||'null');if(o){if(typeof o.app==='string')S.notif.app=o.app.slice(0,18);if(NICONS[o.icon])S.notif.icon=o.icon;if(o.glass==='claro'||o.glass==='escuro')S.notif.glass=o.glass;}}catch(e){}
+  var ic=recall('podio.nicon');if(ic)setNotifIconSrc(ic,false);
+  buildNotifIcons();
+})();
 function drawFrame(ctx,L){if(raceHas('frame'))ctx.drawImage(raceImg[S.format],0,0,L.W,L.H);}
 /* default size of the corner logo: discreet, the athlete can make it bigger with the fingers */
 function logoBox(){
@@ -1820,6 +2014,9 @@ function layoutDef(L,m,layout,style){
     var pw=story?780:760,ph=166;items.push({id:'score',kind:'score',w:pw,h:ph,cx:pad+pw/2,cy:L.top+24+ph/2,r:0,d:S.match||{}});
     logo=logoAt(L,'tr',200,120);
     bg=function(ctx){vgrad(ctx,0,L.top+460,0.5,0,W);};
+  }else if(layout==='notif'){ // an iPhone-style glass notification at the bottom
+    var nw=W-2*44,nh=notifHeight(nw);items.push({id:'notif',kind:'notif',w:nw,h:nh,cx:W/2,cy:L.bottom-nh/2-(story?6:0),r:0});
+    logo=logoAt(L,'tr',200,120);
   }else{ // tv
     var vh=story?330:300;items.push({id:'tv',kind:'tv',w:W-2*pad,h:vh,cx:W/2,cy:L.bottom-vh/2,r:0});
     slot={x:W-pad-(story?300:250),y:L.top+20,w:story?300:250,h:story?400:300,anchor:'tr'};logo=logoAt(L,'tl',220,130);
@@ -1849,7 +2046,7 @@ function tfFor(it,pre){var t=S.tf[pre+it.id];return t?t:{x:it.cx,y:it.cy,s:1,r:i
 
 /* ---------- each sticker is cached as its own image, then placed with move / scale / rotate ---------- */
 var elCache={},fontsVer=0,scalingId=null,gestTarget=null;
-function contentKey(){return [S.title,S.date,S.dist,S.time,S.elev,S.detail,S.sport,S.accent,S.mapStyle,routeVer,logoVer,S.logoVar,raceVer,race?race.id:'',S.extraWhite,S.format,fontsVer,S.font,S.sport==='futebol'?JSON.stringify(S.match):''].join('|');}
+function contentKey(){return [S.title,S.date,S.dist,S.time,S.elev,S.detail,S.sport,S.accent,S.mapStyle,routeVer,logoVer,S.logoVar,raceVer,race?race.id:'',S.extraWhite,S.format,fontsVer,S.font,S.sport==='futebol'?JSON.stringify(S.match):'',S.template==='notif'?JSON.stringify(S.notif)+nIconVer+(hasRoute()?1:0):''].join('|');}
 function drawElLocal(ctx,it,style){resetText(ctx);if(it.kind==='map')WIDGETS[it.style](ctx,it.w,it.h);else DRAW[it.kind](ctx,it,metrics(),style);resetText(ctx);}
 function elImage(it,s,stale){
   var key=it.kind+'|'+(it.variant||'')+'|'+Math.round(it.w)+'|'+Math.round(it.h)+'|'+(it.style||'')+'|'+contentKey(),c=elCache[it.id];
@@ -1862,12 +2059,14 @@ function elImage(it,s,stale){
   c.key=key;c.s=s;c.pad=pad;return c;
 }
 function drawItem(ctx,it,t,stale){
+  if(it.kind==='notif')drawGlass(ctx,it,t);
   var c=elImage(it,t.s,stale),k=t.s/c.s;
   ctx.save();ctx.translate(t.x,t.y);ctx.rotate(t.r);
   ctx.drawImage(c.canvas,-it.w*t.s/2-c.pad*k,-it.h*t.s/2-c.pad*k,c.canvas.width*k,c.canvas.height*k);
   ctx.restore();
 }
 function drawItemDirect(ctx,it,t,style){
+  if(it.kind==='notif')drawGlass(ctx,it,t);
   ctx.save();ctx.translate(t.x,t.y);ctx.rotate(t.r);ctx.scale(t.s,t.s);ctx.translate(-it.w/2,-it.h/2);
   var o=SHK;SHK=o*t.s;drawElLocal(ctx,it,style);SHK=o;ctx.restore();resetText(ctx);
 }
@@ -2121,7 +2320,7 @@ function captions(){
 
 /* ---------- UI ---------- */
 var raf=0,thumbTimer=0,activeTab='treino';
-function schedule(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;render(cv,true);updateCaptions();updatePill();updateCalc();updateQNote();updateUnhide();if(!pointers.size)scheduleThumbs();});}
+function schedule(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;if(S.template==='notif')syncNotifFields();render(cv,true);updateCaptions();updatePill();updateCalc();updateQNote();updateUnhide();if(!pointers.size)scheduleThumbs();});}
 function scheduleThumbs(now){clearTimeout(thumbTimer);thumbTimer=setTimeout(renderThumbs,now?0:180);}
 /* draws without the race art and the extra logo, then puts them back */
 function bareModel(fn){var r=race,ri=raceImg,x=S.showExtra;race=null;raceImg={};S.showExtra=false;try{fn();}finally{race=r;raceImg=ri;S.showExtra=x;}}
@@ -2259,13 +2458,13 @@ function syncFontPick(){
 }
 function updateModelGrid(){
   var foot=S.sport==='futebol';
-  document.querySelectorAll('.mcard[data-sport]').forEach(function(c){c.hidden=(c.getAttribute('data-sport')==='futebol')!==foot;});
-  if(foot!==!!FOOT_TPL[S.template]){var t=$(foot?'t-placar':'t-percurso');t.checked=true;t.dispatchEvent(new Event('change'));}
+  document.querySelectorAll('.mcard[data-sport]').forEach(function(c){var ds=c.getAttribute('data-sport');c.hidden=ds==='todos'?false:(ds==='futebol')!==foot;});
+  if(S.template!=='notif'&&foot!==!!FOOT_TPL[S.template]){var t=$(foot?'t-placar':'t-percurso');t.checked=true;t.dispatchEvent(new Event('change'));}
 }
 [['fTeamA','a'],['fTeamB','b'],['fClock','clock']].forEach(function(p){$(p[0]).addEventListener('input',function(){S.match[p[1]]=this.value;S.dataSample=false;schedule();});});
 [['fGoalsA','ga'],['fGoalsB','gb']].forEach(function(p){$(p[0]).addEventListener('input',function(){var v=this.value.replace(/\D/g,'').slice(0,2);if(v!==this.value)this.value=v;S.match[p[1]]=v;S.dataSample=false;schedule();});});
 [['cTeamA','ca'],['cTeamB','cb']].forEach(function(p){$(p[0]).addEventListener('input',function(){S.match[p[1]]=this.value;schedule();});});
-document.querySelectorAll('input[name="tpl"]').forEach(function(r){r.addEventListener('change',function(){S.template=r.value;S.sel=null;updateSelTool();$('modelName').textContent=TPL_NAME[S.template]||'Modelo';schedule();});});
+document.querySelectorAll('input[name="tpl"]').forEach(function(r){r.addEventListener('change',function(){S.template=r.value;S.sel=null;updateSelTool();$('modelName').textContent=TPL_NAME[S.template]||'Modelo';syncNotifUI();schedule();});});
 document.querySelectorAll('input[name="mapStyle"]').forEach(function(r){r.addEventListener('change',function(){
   S.mapStyle=r.value;$('tplDesc').textContent=STYLE_DESC[S.mapStyle];$('pixelRow').hidden=S.mapStyle!=='retro';schedule();
 });});
@@ -2403,13 +2602,14 @@ function raceFromURL(){
 document.querySelectorAll('input[name="quality"]').forEach(function(r){r.addEventListener('change',function(){S.quality=r.value;store('podio.quality',S.quality);updateQNote();});});
 /* ---------- screens: início → modelo → editor ---------- */
 var screen='home',histOK=true,editedOnce=false,DEPTH={home:0,pick:1,editor:2};
-var TPL_NAME={percurso:'Percurso',peito:'Peito',gigante:'Gigante',discreto:'Discreto',relogio:'Relógio',medalha:'Medalha',recibo:'Recibo',tv:'TV',placar:'Placar TV',telao:'Telão',golgig:'Placar gigante'};
+var TPL_NAME={percurso:'Percurso',peito:'Peito',gigante:'Gigante',discreto:'Discreto',relogio:'Relógio',medalha:'Medalha',recibo:'Recibo',tv:'TV',placar:'Placar TV',telao:'Telão',golgig:'Placar gigante',notif:'Notificação'};
 function go(name){
   if(cutMode)exitCut();
   screen=name;document.body.setAttribute('data-screen',name);closeLogoMenu();
   if(name==='editor'){
     $('modelName').textContent=TPL_NAME[S.template]||'Modelo';
     if(!editedOnce){editedOnce=true;selectTab('treino',false);}
+    syncNotifUI();
     fitFrame();schedule();
   }else{S.sel=null;updateSelTool();}
   scheduleThumbs(true);
@@ -2500,7 +2700,7 @@ document.querySelectorAll('.m-edit').forEach(function(b){b.addEventListener('cli
 });});
 /* ---------- athlete in front: a smart brush marks the person, the layout goes behind ---------- */
 var CUT=null,cutMode=false,cutStroke=null,cutCursor=null,cutTmp=null,CUT_TOL=50;
-var FRONT={logo:1,rlogo:1,xlogo:1,spons:1,score:1};
+var FRONT={logo:1,rlogo:1,xlogo:1,spons:1,score:1,notif:1};
 function ensureCut(){
   if(CUT&&CUT.src===S.photo)return CUT;
   var src=photoSrc();if(!src)return null;
