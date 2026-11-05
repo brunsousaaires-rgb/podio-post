@@ -146,6 +146,12 @@ body[data-screen="editor"] #home,body[data-screen="editor"] #pick{display:none}
 .mcard input:checked + .m-img::after{content:"";position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;background:var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 12.5l4.5 4.5L18.5 8'/%3E%3C/svg%3E") center/15px no-repeat;box-shadow:0 4px 10px rgba(0,0,0,.4)}
 .mcard input:focus-visible + .m-img{outline:2px solid #fff;outline-offset:4px}
 .mcard:active .m-img{transform:scale(.985)}
+  .mcard{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  .mcard.dragging{z-index:30;transition:none!important;will-change:transform}
+  .mcard.dragging .m-img{transform:none;box-shadow:0 0 0 2px var(--accent),0 30px 60px -12px rgba(0,0,0,.75)}
+  body.sorting,body.sorting *{cursor:grabbing!important}
+  .order-hint{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:16px 2px -4px;color:var(--muted);font-size:12.5px;line-height:1.35}
+  .order-hint .link{flex:none}
 .m-edit{position:absolute;left:10px;right:10px;bottom:10px;display:none;align-items:center;justify-content:center;gap:8px;height:46px;border:0;border-radius:14px;background:linear-gradient(180deg,var(--accent-2),var(--accent) 60%,var(--accent-deep));color:#fff;font-weight:800;font-size:15.5px;cursor:pointer;box-shadow:0 12px 26px -10px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.35);animation:editIn .22s ease}
 .m-edit svg{width:18px;height:18px}
 .mcard input:checked + .m-img .m-edit{display:flex}
@@ -462,6 +468,7 @@ button.lg[aria-pressed="true"] .nlab{color:var(--text)}
         <label><input class="vh" type="radio" name="fmt" id="f-story" value="story" checked><span>Story 9:16</span></label>
         <label><input class="vh" type="radio" name="fmt" id="f-feed" value="feed"><span>Feed 4:5</span></label>
       </div>
+      <div class="order-hint"><span>Segure um modelo e arraste para mudar a ordem</span><button class="link" id="orderReset" type="button" hidden>Ordem original</button></div>
       <div class="mgrid" role="radiogroup" aria-labelledby="pickTitle">
         <div class="mcard" data-sport="geral"><input class="vh" type="radio" name="tpl" id="t-percurso" value="percurso" checked aria-label="Percurso"><span class="m-img"><canvas data-layout="percurso" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="percurso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Percurso</span><span class="m-desc">Mapa grande e os números embaixo</span></div>
         <div class="mcard" data-sport="geral"><input class="vh" type="radio" name="tpl" id="t-peito" value="peito" aria-label="Peito"><span class="m-img"><canvas data-layout="peito" data-w="360" width="360" height="640"></canvas><button class="m-edit" type="button" data-edit="peito"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Editar</button></span><span class="m-name">Peito</span><span class="m-desc">Os números num número de peito de prova</span></div>
@@ -2460,7 +2467,89 @@ function updateModelGrid(){
   var foot=S.sport==='futebol';
   document.querySelectorAll('.mcard[data-sport]').forEach(function(c){var ds=c.getAttribute('data-sport');c.hidden=ds==='todos'?false:(ds==='futebol')!==foot;});
   if(S.template!=='notif'&&foot!==!!FOOT_TPL[S.template]){var t=$(foot?'t-placar':'t-percurso');t.checked=true;t.dispatchEvent(new Event('change'));}
+  applyOrder();
 }
+/* ---------- model order: Notificação first, Medalha and Relógio last, or the athlete's own order ---------- */
+var ORDER_DEF={geral:['notif','percurso','peito','gigante','discreto','recibo','tv','medalha','relogio'],futebol:['notif','placar','telao','golgig']};
+function orderGroup(){return S.sport==='futebol'?'futebol':'geral';}
+function savedOrder(g){try{var o=JSON.parse(recall('podio.order.'+g)||'null');if(Array.isArray(o)&&o.length)return o;}catch(e){}return null;}
+function cardOf(id){var i=document.getElementById('t-'+id);return i?i.closest('.mcard'):null;}
+function applyOrder(){
+  var g=orderGroup(),def=ORDER_DEF[g],o=savedOrder(g)||def,grid=document.querySelector('.mgrid');if(!grid)return;
+  var ids=o.filter(function(id,i){return def.indexOf(id)>=0&&o.indexOf(id)===i;});
+  def.forEach(function(id){if(ids.indexOf(id)<0)ids.splice(Math.min(def.indexOf(id),ids.length),0,id);});
+  ids.forEach(function(id){var c=cardOf(id);if(c)grid.appendChild(c);});
+  var rb=$('orderReset');if(rb)rb.hidden=!savedOrder(g);
+}
+function saveOrderFromDom(){
+  var ids=Array.prototype.filter.call(document.querySelectorAll('.mgrid .mcard'),function(c){return !c.hidden;}).map(function(c){return c.querySelector('input[name="tpl"]').value;});
+  store('podio.order.'+orderGroup(),JSON.stringify(ids));$('orderReset').hidden=false;
+}
+$('orderReset').addEventListener('click',function(){store('podio.order.'+orderGroup(),null);applyOrder();scheduleThumbs(true);toast('Ordem original de volta');});
+/* hold a model (about half a second) and drag it up or down */
+(function(){
+  var grid=document.querySelector('.mgrid'),scroller=document.querySelector('.pick-scroll');if(!grid||!scroller)return;
+  var st=null,justSorted=0,lastTouch=0,HOLD=400,SLOP=10;
+  function visible(){return Array.prototype.filter.call(grid.querySelectorAll('.mcard'),function(c){return !c.hidden;});}
+  function start(card,x,y){st={card:card,x0:x,y0:y,x:x,y:y,active:false};st.timer=setTimeout(begin,HOLD);}
+  function begin(){
+    if(!st)return;var r=st.card.getBoundingClientRect();
+    st.active=true;st.offX=st.x-r.left;st.offY=st.y-r.top;
+    st.card.classList.add('dragging');document.body.classList.add('sorting');
+    try{if(navigator.vibrate)navigator.vibrate(12);}catch(e){}
+    follow();st.raf=requestAnimationFrame(edge);
+  }
+  function follow(){
+    var c=st.card;c.style.transform='';var r=c.getBoundingClientRect();
+    c.style.transform='translate('+(st.x-st.offX-r.left).toFixed(1)+'px,'+(st.y-st.offY-r.top).toFixed(1)+'px) scale(1.04)';
+  }
+  function reorder(){
+    var target=null,cx=st.x,cy=st.y,all=visible();
+    all.forEach(function(c){if(c===st.card)return;var r=c.getBoundingClientRect();if(cx>=r.left&&cx<=r.right&&cy>=r.top&&cy<=r.bottom)target=c;});
+    if(!target)return;
+    var from=all.indexOf(st.card),to=all.indexOf(target);if(from<0||to<0||from===to)return;
+    var others=all.filter(function(c){return c!==st.card;}),before=others.map(function(c){return c.getBoundingClientRect();});
+    if(from<to)grid.insertBefore(st.card,target.nextSibling);else grid.insertBefore(st.card,target);
+    others.forEach(function(c,i){
+      var a=before[i],b=c.getBoundingClientRect(),dx=a.left-b.left,dy=a.top-b.top;if(!dx&&!dy)return;
+      c.style.transition='none';c.style.transform='translate('+dx+'px,'+dy+'px)';c.getBoundingClientRect();
+      c.style.transition='transform .22s cubic-bezier(.2,.8,.2,1)';c.style.transform='';
+    });
+    follow();
+  }
+  function edge(){   /* scroll the list when the finger reaches the top or the bottom */
+    if(!st||!st.active)return;
+    var r=scroller.getBoundingClientRect(),e=90,v=0;
+    if(st.y<r.top+e)v=-Math.ceil((r.top+e-st.y)/5);else if(st.y>r.bottom-e)v=Math.ceil((st.y-(r.bottom-e))/5);
+    if(v){var b=scroller.scrollTop;scroller.scrollTop+=v;if(scroller.scrollTop!==b){follow();reorder();}}
+    st.raf=requestAnimationFrame(edge);
+  }
+  function move(x,y,e){
+    if(!st)return;st.x=x;st.y=y;
+    if(!st.active){if(Math.hypot(x-st.x0,y-st.y0)>SLOP){clearTimeout(st.timer);st=null;}return;}
+    if(e&&e.cancelable)e.preventDefault();
+    follow();reorder();
+  }
+  function end(){
+    if(!st)return;clearTimeout(st.timer);
+    if(st.active){
+      var c=st.card;cancelAnimationFrame(st.raf);c.classList.remove('dragging');document.body.classList.remove('sorting');
+      c.style.transition='transform .2s cubic-bezier(.2,.8,.2,1)';c.style.transform='';
+      setTimeout(function(){visible().forEach(function(x){x.style.transition='';x.style.transform='';});},240);
+      saveOrderFromDom();justSorted=Date.now();
+    }
+    st=null;
+  }
+  grid.addEventListener('touchstart',function(e){lastTouch=Date.now();var c=e.target.closest('.mcard');if(!c||e.touches.length>1){end();return;}var t=e.touches[0];start(c,t.clientX,t.clientY);},{passive:true});
+  grid.addEventListener('touchmove',function(e){if(!st)return;var t=e.touches[0];move(t.clientX,t.clientY,e);},{passive:false});
+  grid.addEventListener('touchend',function(){lastTouch=Date.now();end();});grid.addEventListener('touchcancel',end);
+  grid.addEventListener('mousedown',function(e){if(e.button!==0||Date.now()-lastTouch<800)return;var c=e.target.closest('.mcard');if(c)start(c,e.clientX,e.clientY);});
+  window.addEventListener('mousemove',function(e){if(st&&Date.now()-lastTouch>800)move(e.clientX,e.clientY,e);});
+  window.addEventListener('mouseup',function(){if(Date.now()-lastTouch>800)end();});
+  /* a drag is not a tap: no selection, no Editar right after dropping */
+  grid.addEventListener('click',function(e){if(Date.now()-justSorted<450){e.stopPropagation();e.preventDefault();}},true);
+  grid.addEventListener('contextmenu',function(e){if(e.target.closest('.mcard'))e.preventDefault();});
+})();
 [['fTeamA','a'],['fTeamB','b'],['fClock','clock']].forEach(function(p){$(p[0]).addEventListener('input',function(){S.match[p[1]]=this.value;S.dataSample=false;schedule();});});
 [['fGoalsA','ga'],['fGoalsB','gb']].forEach(function(p){$(p[0]).addEventListener('input',function(){var v=this.value.replace(/\D/g,'').slice(0,2);if(v!==this.value)this.value=v;S.match[p[1]]=v;S.dataSample=false;schedule();});});
 [['cTeamA','ca'],['cTeamB','cb']].forEach(function(p){$(p[0]).addEventListener('input',function(){S.match[p[1]]=this.value;schedule();});});
@@ -2603,8 +2692,14 @@ document.querySelectorAll('input[name="quality"]').forEach(function(r){r.addEven
 /* ---------- screens: início → modelo → editor ---------- */
 var screen='home',histOK=true,editedOnce=false,DEPTH={home:0,pick:1,editor:2};
 var TPL_NAME={percurso:'Percurso',peito:'Peito',gigante:'Gigante',discreto:'Discreto',relogio:'Relógio',medalha:'Medalha',recibo:'Recibo',tv:'TV',placar:'Placar TV',telao:'Telão',golgig:'Placar gigante',notif:'Notificação'};
+function selectFirstModel(){
+  var c=Array.prototype.filter.call(document.querySelectorAll('.mgrid .mcard'),function(x){return !x.hidden;})[0];if(!c)return;
+  var i=c.querySelector('input[name="tpl"]');if(!i.checked){i.checked=true;i.dispatchEvent(new Event('change'));}
+  var sc=document.querySelector('.pick-scroll');if(sc)sc.scrollTop=0;
+}
 function go(name){
   if(cutMode)exitCut();
+  var prev=screen;if(name==='pick'&&prev==='home')selectFirstModel();
   screen=name;document.body.setAttribute('data-screen',name);closeLogoMenu();
   if(name==='editor'){
     $('modelName').textContent=TPL_NAME[S.template]||'Modelo';
