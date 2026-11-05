@@ -115,6 +115,8 @@ body[data-screen="editor"] #home,body[data-screen="editor"] #pick{display:none}
 .h-sub{margin:0 0 6px;max-width:36ch;color:var(--text-2);font-size:15.5px}
 .h-race{display:flex;align-items:center;gap:12px;padding:10px 14px 10px 10px;border-radius:18px;background:var(--glass);border:1px solid var(--line);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
 .h-race img{flex:none;width:48px;height:48px;object-fit:contain}
+.h-race-btn{flex:none;margin-left:auto;padding:9px 14px;border-radius:999px;border:0;background:linear-gradient(180deg,var(--accent-2),var(--accent));color:#fff;font:inherit;font-weight:800;font-size:13.5px;cursor:pointer}
+.h-race-btn.on{background:var(--glass-2);color:var(--text);box-shadow:0 0 0 1px var(--line-2) inset}
 .h-race b{display:block;font-weight:800;font-size:15px}
 .h-race small{display:block;color:var(--muted);font-size:13px}
 .steps{display:flex;margin:8px 0 0;padding:0;list-style:none}
@@ -414,7 +416,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radiu
     <canvas class="hc c1" data-home="corrida" data-w="360" width="360" height="640"></canvas>
   </div>
   <div class="h-body gut">
-    <div class="h-race" id="homeRace" hidden><img id="homeRaceLogo" alt=""><div><b id="homeRaceName">Corrida</b><small>Arte oficial da prova liberada para você</small></div></div>
+    <div class="h-race" id="homeRace" hidden><img id="homeRaceLogo" alt=""><div><b id="homeRaceName">Corrida</b><small id="homeRaceSub">Arte oficial da prova disponível</small></div><button class="h-race-btn" id="homeRaceBtn" type="button">Usar arte</button></div>
     <h1 class="h-title" id="homeTitle">Seu treino pronto para postar</h1>
     <p class="h-sub">Escolha a foto, o modelo e coloque os números do treino. O mapa do Strava entra junto.</p>
     <label class="cta" for="photoInHome">
@@ -2119,9 +2121,11 @@ function captions(){
 var raf=0,thumbTimer=0,activeTab='treino';
 function schedule(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;render(cv,true);updateCaptions();updatePill();updateCalc();updateQNote();updateUnhide();if(!pointers.size)scheduleThumbs();});}
 function scheduleThumbs(now){clearTimeout(thumbTimer);thumbTimer=setTimeout(renderThumbs,now?0:180);}
+/* draws without the race art and the extra logo, then puts them back */
+function bareModel(fn){var r=race,ri=raceImg,x=S.showExtra;race=null;raceImg={};S.showExtra=false;try{fn();}finally{race=r;raceImg=ri;S.showExtra=x;}}
 function renderThumbs(){
   if(screen==='home')renderHome();
-  if(screen==='pick')document.querySelectorAll('canvas[data-layout]').forEach(function(c){if(c.closest('.mcard[hidden]'))return;renderThumb(c,c.getAttribute('data-layout'),S.mapStyle);});
+  if(screen==='pick')bareModel(function(){document.querySelectorAll('canvas[data-layout]').forEach(function(c){if(c.closest('.mcard[hidden]'))return;renderThumb(c,c.getAttribute('data-layout'),S.mapStyle);});});
   if(screen==='editor'&&!$('pane-mapa').hidden)document.querySelectorAll('canvas[data-style]').forEach(function(c){renderThumb(c,S.template,c.getAttribute('data-style'));});
 }
 
@@ -2325,7 +2329,7 @@ var NONE_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 function distLabel(d){return (Math.abs(d-42.195)<0.3?'42':Math.abs(d-21.0975)<0.2?'21':String(d).replace('.',','))+'K';}
 function shortDate(iso){var p=String(iso||'').split('-');return p.length===3?(+p[2])+' '+MONTHS[+p[1]-1]:'';}
 function isoToField(iso){var p=String(iso||'').split('-');return p.length===3?fmtDate(new Date(+p[0],+p[1]-1,+p[2])):S.date;}
-function raceListed(){return RACES.filter(function(r){return r.lista!==false||(race&&race.id===r.id);});}
+function raceListed(){return RACES.filter(function(r){return r.lista!==false||(race&&race.id===r.id)||(linkRace&&linkRace.id===r.id);});}
 function buildRaceList(){
   var box=$('raceList'),list=raceListed();box.textContent='';
   $('raceSec').hidden=!list.length;$('tab-corrida').hidden=!list.length;
@@ -2345,7 +2349,10 @@ function syncRaceUI(){
   var canShare=/^https?:$/.test(location.protocol)&&!window.claude;
   $('raceShare').hidden=!(race&&canShare);
   var sw=$('raceSwatch');sw.hidden=!(race&&race.cor);
-  $('homeRace').hidden=!race;if(race){$('homeRaceLogo').src=race.logo;$('homeRaceName').textContent=race.nome;}
+  var hr=linkRace;$('homeRace').hidden=!hr;
+  if(hr){var on=!!(race&&race.id===hr.id);$('homeRaceLogo').src=hr.logo;$('homeRaceName').textContent=hr.nome;
+    $('homeRaceSub').textContent=on?'Arte oficial ativada nas suas fotos':'Arte oficial da prova disponível';
+    var hb=$('homeRaceBtn');hb.textContent=on?'Usando':'Usar arte';hb.classList.toggle('on',on);hb.setAttribute('aria-pressed',on?'true':'false');}
   if(!race)return;
   $('rcLogo').checked=S.raceLogo;$('rcSpons').checked=S.raceSpons;$('rcFrame').checked=S.raceFrame;
   $('rcSponsRow').hidden=!race.patrocinadores;$('rcFrameRow').hidden=!(race.moldura&&(race.moldura.story||race.moldura.feed));
@@ -2360,7 +2367,7 @@ function syncRaceUI(){
 }
 function setRace(id,opt){
   opt=opt||{};var r=id?raceById(id):null,prev=race;
-  race=r;raceImg={};raceVer++;store('podio.race',r?r.id:null);
+  race=r;raceImg={};raceVer++;
   if(r){
     raceImg.logo=loadImg(r.logo);raceImg.spons=loadImg(r.patrocinadores);
     var m=r.moldura||{};raceImg.story=loadImg(m.story);raceImg.feed=loadImg(m.feed);
@@ -2383,6 +2390,8 @@ $('raceShare').addEventListener('click',function(){
   var ok=function(){toast('Link da corrida copiado');},fail=function(){toast(url);};
   try{navigator.clipboard.writeText(url).then(ok,fail);}catch(e){fail();}
 });
+var linkRace=null;   /* the race of the link the athlete opened: offered, never forced */
+$('homeRaceBtn').addEventListener('click',function(){if(!linkRace)return;setRace(race&&race.id===linkRace.id?'':linkRace.id,{announce:true});});
 function raceFromURL(){
   try{var q=new URLSearchParams(location.search).get('corrida');if(q)return q;
     var m=location.pathname.match(/^\/c\/([^\/?#]+)/);return m?decodeURIComponent(m[1]):null;}catch(e){return null;}
@@ -2413,7 +2422,7 @@ window.addEventListener('popstate',function(e){var s=e.state&&e.state.s;if(s&&DE
 var HOME_EMBED={"hyrox":{"photo":"/home/hyrox.jpg","mask":"/home/hyrox-mask.png","bbox":[0.1365,0.1034,0.8176,1.0]},"corrida":{"photo":"/home/corrida.jpg","mask":"/home/corrida-mask.png","bbox":[0.2766,0.2375,0.7246,0.9554]},"futebol":{"photo":"/home/futebol.jpg","mask":"/home/futebol-mask.png","bbox":[0.0435,0.212,0.9928,0.8362]}};
 /*HOME-EMBED-END*/
 var HOME_CARDS={
-  corrida:{sport:'corrida',layout:'discreto',style:'linha',race:true,cut:true,place:{title:{s:0.72,at:'bl'},map:{s:0.8,at:'br'}}},
+  corrida:{sport:'corrida',layout:'discreto',style:'linha',cut:true,place:{title:{s:0.72,at:'bl'},map:{s:0.8,at:'br'}}},
   hyrox:{sport:'hyrox',layout:'gigante',style:'linha',cut:false},
   futebol:{sport:'futebol',layout:'placar',style:'linha',cut:false,title:'Final da copa',
     match:{a:'Verde',b:'Azul',ga:2,gb:0,clock:'2ºT · 38:12',ca:'#22A45A',cb:'#2F6BFF',title:'Final da copa'}}
@@ -2434,7 +2443,7 @@ function renderHomeCard(c,key){
     S.title=cfg.title||smp.title;S.dist=smp.dist;S.time=smp.time;S.elev=smp.elev;S.detail=smp.detail;
     S.showMap=true;S.showData=true;S.showLogo=true;S.zoom=100;S.ox=0;S.oy=0;S.darken=0;S.tf={};S.hidden={};
     S.grad={on:false,color:'#000000',alpha:80,start:0,end:45};S.match=cfg.match||null;S.showExtra=false;
-    if(cfg.race&&race){S.raceLogo=S.raceSpons=S.raceFrame=true;}else{race=null;raceImg={};}
+    race=null;raceImg={};
     CUT=cfg.cut&&ready(hi.mask)?{src:hi.photo,canvas:hi.mask,bbox:hi.bbox,dirty:false,painted:true,MW:hi.mask.naturalWidth,MH:hi.mask.naturalHeight}:null;
     S.cutOn=!!CUT;
     if(cfg.place){   /* smaller, pinned to a corner, so nothing covers the athlete */
@@ -3210,10 +3219,9 @@ document.body.setAttribute('data-screen','home');try{history.replaceState({s:'ho
 (function(){var q=recall('podio.quality');if(q==='ig'||q==='max'){S.quality=q;$('q-'+q).checked=true;}})();
 buildLogoPicks();showLogoUnlock();syncGrad();setRange($('cutSize'));updateCutBar();
 (function(){
-  var rid=raceFromURL(),saved=recall('podio.race');
-  if(rid&&raceById(rid))setRace(rid,{announce:true});
-  else if(!rid&&saved&&raceById(saved))setRace(saved,{});
-  else{buildRaceList();syncRaceUI();if(rid)setTimeout(function(){toast('Não encontrei essa corrida');},400);}
+  var rid=raceFromURL();store('podio.race',null);
+  linkRace=rid?raceById(rid)||null:null;
+  buildRaceList();syncRaceUI();if(rid&&!linkRace)setTimeout(function(){toast('Não encontrei essa corrida');},400);
 })();
 syncFields();updateSportUI();setRange($('darken'));constrain(false);updateLogoBtn();updateSelTool();fitFrame();
 render(cv,true);updateCaptions();updatePill();updateCalc();updateExpand();scheduleThumbs(true);
