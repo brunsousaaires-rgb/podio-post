@@ -1,15 +1,15 @@
 {
   "name": "Pódio Post",
   "short_name": "Pódio",
-  "description": "Foto, mapa do percurso do Strava e os números do treino em story ou feed.",
+  "description": "Sua foto com o mapa do percurso, os números do treino ou o placar do jogo, pronta para o story ou o feed. Grátis para atletas.",
   "lang": "pt-BR",
   "dir": "ltr",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#F3F4F7",
-  "theme_color": "#F3F4F7",
+  "background_color": "#121A23",
+  "theme_color": "#121A23",
   "icons": [
     {
       "src": "/icons/icon-192.png",

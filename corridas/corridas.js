@@ -10,7 +10,7 @@ window.PODIO_RACES=[
       "#MovimentoComConexao"
     ],
     "logo": "/corridas/movimento-com-conexao/logo.png",
-    "patrocinadores": "/corridas/movimento-com-conexao/patrocinadores.png",
+    "patrocinadores": null,
     "moldura": {
       "story": "/corridas/movimento-com-conexao/moldura-story.png",
       "feed": "/corridas/movimento-com-conexao/moldura-feed.png"

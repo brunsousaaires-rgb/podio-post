@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <title>Pódio Post · seu treino pronto para o Instagram</title>
-<meta name="description" content="Monte o story ou o post do seu treino de corrida, ciclismo, HYROX ou CrossFit: foto, mapa do percurso do Strava, números do treino, logo e dicas de pose e música.">
-<meta name="theme-color" content="#F3F4F7">
-<meta name="color-scheme" content="light">
+<meta name="description" content="Monte o story ou o post do seu treino ou jogo: corrida, ciclismo, HYROX, CrossFit e futebol. Foto, mapa do percurso do Strava, números do treino, placar e legendas prontas. Grátis para atletas.">
+<meta name="theme-color" content="#121A23">
+<meta name="color-scheme" content="dark">
 <link rel="canonical" href="https://podio-post.vercel.app/">
 <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/icons/favicon-32.png" sizes="32x32" type="image/png">
@@ -14,13 +14,13 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Pódio">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:site_name" content="Pódio Post">
 <meta property="og:url" content="https://podio-post.vercel.app/">
 <meta property="og:title" content="Pódio Post · seu treino pronto para o Instagram">
-<meta property="og:description" content="Foto, mapa do percurso do Strava e os números do treino em story ou feed.">
+<meta property="og:description" content="Sua foto com o mapa do percurso, os números do treino ou o placar do jogo, pronta para o story ou o feed. Grátis para atletas.">
 <meta property="og:image" content="https://podio-post.vercel.app/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -28,7 +28,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://podio-post.vercel.app/og.jpg">
 <script src="/corridas/corridas.js"></script>
-<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{color-scheme:dark}body{background:#121A23}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Press+Start+2P&display=swap">
@@ -604,7 +604,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radiu
             <span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6a3 3 0 0 0 0-6h-4a3 3 0 0 1 0-6h6"/></svg></span>
             <span class="grow"><b>Percurso do Strava</b><small id="gpxName">Percurso de exemplo</small></span>
             <span class="pill">Carregar</span>
-            <input class="vh" type="file" id="gpxIn" accept=".gpx,application/gpx+xml,application/xml,text/xml">
+            <input class="vh" type="file" id="gpxIn">
           </label>
         </div>
         <p class="error" id="mediaError" hidden></p>
@@ -869,6 +869,8 @@ function resetText(ctx){ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shado
 function textShadow(ctx){ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=22*SHK;ctx.shadowOffsetY=2*SHK;}
 function noShadow(ctx){ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;}
 function fitFont(ctx,text,fn,w,max,maxW,min){min=min||22;var s=max;ctx.font=fn(w,s);while(s>min&&ctx.measureText(text).width>maxW){s-=2;ctx.font=fn(w,s);}return s;}
+/* like fitFont, but a line that still does not fit at the smallest size ends in … instead of running out of its box */
+function fitText(ctx,text,fn,w,max,maxW,min){fitFont(ctx,text,fn,w,max,maxW,min||18);if(ctx.measureText(text).width<=maxW)return text;var t=text;while(t.length>1&&ctx.measureText(t+'…').width>maxW)t=t.slice(0,-1);return t.replace(/[\s·,]+$/,'')+'…';}
 function unitSize(s){return Math.max(20,Math.round(s*0.3));}
 function pairWidth(ctx,v,u,s,w){ctx.font=F.disp(w,s);var tw=ctx.measureText(v).width;if(u){ctx.font=F.mono(500,unitSize(s));tw+=s*0.08+ctx.measureText(u).width;}return tw;}
 function glyphBox(ctx,text,size){var mt=ctx.measureText(text);return {a:mt.actualBoundingBoxAscent||size*0.74,d:mt.actualBoundingBoxDescent||size*0.12};}
@@ -1437,7 +1439,7 @@ var DRAW={
   stats:function(ctx,it,m){
     textShadow(ctx);
     if(it.variant==='row'){
-      if(m.detail){fitFont(ctx,m.detail,F.mono,500,32,it.w);ctx.fillStyle='#fff';ctx.fillText(m.detail,0,40);}
+      if(m.detail){var _ft=fitText(ctx,m.detail,F.mono,500,32,it.w);ctx.fillStyle='#fff';ctx.fillText(_ft,0,40);}
       if(it.row.length){var vy=it.h-6;statsRow(ctx,it.row,0,it.w,vy-it.vMax-18,vy,it.vMax,{labelColor:'rgba(255,255,255,.78)',valueColor:'#fff',unitColor:'rgba(255,255,255,.85)',rule:'rgba(255,255,255,.28)',shadow:true});}
     }else if(it.variant==='column'){
       var y=30;
@@ -1445,10 +1447,10 @@ var DRAW={
         ctx.font=F.mono(500,22);ls(ctx,3);ctx.fillStyle='rgba(255,255,255,.8)';ctx.fillText(r.label.toUpperCase(),0,y);ls(ctx,0);
         drawPair(ctx,0,y+74,r.value,r.unit,70,800,'#fff','rgba(255,255,255,.88)');y+=136;
       });
-      if(m.detail){fitFont(ctx,m.detail,F.mono,500,26,it.w);ctx.fillStyle='#fff';ctx.fillText(m.detail,0,y);}
+      if(m.detail){var _ft=fitText(ctx,m.detail,F.mono,500,26,it.w);ctx.fillStyle='#fff';ctx.fillText(_ft,0,y);}
     }else{
       var parts=m.stats.map(unitStr);if(m.detail)parts.push(m.detail);var line=parts.join('  ·  ');
-      ctx.textAlign='center';fitFont(ctx,line,F.mono,500,34,it.w);ctx.fillStyle='rgba(255,255,255,.95)';ctx.fillText(line,it.w/2,it.h-14);ctx.textAlign='left';
+      ctx.textAlign='center';var _ft=fitText(ctx,line,F.mono,500,34,it.w);ctx.fillStyle='rgba(255,255,255,.95)';ctx.fillText(_ft,it.w/2,it.h-14);ctx.textAlign='left';
     }
   },
   hero:function(ctx,it,m){
@@ -1484,7 +1486,7 @@ var DRAW={
     ctx.setLineDash([10,9]);ctx.strokeStyle='rgba(20,20,24,.28)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(40,divY);ctx.lineTo(bw-40,divY);ctx.stroke();ctx.setLineDash([]);
     var bcW=200,rowW=bw-120-bcW-30;
     if(m.stats.length)statsRow(ctx,m.stats.slice(0,3),60,rowW,divY+46,divY+104,58,{labelSize:20,labelColor:soft,valueColor:ink,unitColor:soft,rule:'rgba(20,20,24,.14)'});
-    else if(m.detail){fitFont(ctx,m.detail,F.mono,500,28,rowW);ctx.fillStyle=ink;ctx.fillText(m.detail,60,divY+80);}
+    else if(m.detail){var _ft=fitText(ctx,m.detail,F.mono,500,28,rowW);ctx.fillStyle=ink;ctx.fillText(_ft,60,divY+80);}
     var bx=bw-60-bcW,by=divY+30,bhh=story?62:52;
     barcode(ctx,bx,by,bcW,bhh,S.title+S.date,ink);
     ctx.font=F.mono(500,16);ls(ctx,2);ctx.fillStyle=soft;ctx.fillText('CHIP '+String(hash(S.title+S.date)%100000).padStart(5,'0'),bx,by+bhh+24);ls(ctx,0);
@@ -1494,7 +1496,7 @@ var DRAW={
     var parts=m.stats.map(function(s){return s.value+(s.unit?(s.unit.charAt(0)==='/'?'':' ')+s.unit:'');});if(m.detail)parts.push(m.detail);
     var line=parts.join('  ·  ');
     var lineTop=h;
-    if(line){fitFont(ctx,line,F.mono,500,34,w);ctx.fillStyle='rgba(255,255,255,.94)';ctx.fillText(line,0,h-6);lineTop=h-6-glyphBox(ctx,line,34).a;}
+    if(line){var _ft=fitText(ctx,line,F.mono,500,34,w);ctx.fillStyle='rgba(255,255,255,.94)';ctx.fillText(_ft,0,h-6);lineTop=h-6-glyphBox(ctx,line,34).a;}
     var capTop=lineTop-(story?300:240);
     if(m.hero){
       var room=lineTop-30-196,hs=fitPair(ctx,m.hero.value,'',900,story?420:340,w,80);ctx.font=F.disp(900,hs);
@@ -1526,7 +1528,7 @@ var DRAW={
     ctx.restore();
     if(hasLine){
       var parts=rest.map(function(s){return (s.label+' '+unitStr(s)).toUpperCase();});if(m.detail)parts.push(m.detail.toUpperCase());
-      var line=parts.join('   ');ctx.textAlign='center';ls(ctx,2);fitFont(ctx,line,F.mono,500,28,w-80);ctx.fillStyle='rgba(255,255,255,.8)';ctx.fillText(line,w/2,h-40);ls(ctx,0);ctx.textAlign='left';
+      var line=parts.join('   ');ctx.textAlign='center';ls(ctx,2);var _ft=fitText(ctx,line,F.mono,500,28,w-80);ctx.fillStyle='rgba(255,255,255,.8)';ctx.fillText(_ft,w/2,h-40);ls(ctx,0);ctx.textAlign='left';
     }
   },
   medal:function(ctx,it,m){
@@ -1599,7 +1601,7 @@ var DRAW={
     var title=S.title.toUpperCase();fitFont(ctx,title,F.disp,800,66,w-spw-140);ctx.fillStyle='#fff';ctx.fillText(title,40,136);
     var row=rowItems(m,true);
     if(row.length)statsRow(ctx,row.slice(0,4),46,w-140,172+42,h-22,Math.min(62,h-172-62),{labelSize:18,labelColor:'#6A6E78',valueColor:'#15171C',unitColor:'#6A6E78',rule:'rgba(20,20,24,.12)'});
-    if(m.detail&&!m.stats.length){fitFont(ctx,m.detail,F.mono,500,24,w-500);ctx.fillStyle='#15171C';ctx.fillText(m.detail,420,h-34);}
+    if(m.detail&&!m.stats.length){var _ft=fitText(ctx,m.detail,F.mono,500,24,w-500);ctx.fillStyle='#15171C';ctx.fillText(_ft,420,h-34);}
   },
   logo:function(ctx,it){
     ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=16*SHK;ctx.shadowOffsetY=2*SHK;
@@ -2236,7 +2238,8 @@ $('expand').addEventListener('click',function(){$('app').classList.toggle('colla
 
 /* inputs */
 document.querySelectorAll('input[name="sport"]').forEach(function(r){r.addEventListener('change',function(){
-  S.sport=r.value;if(S.dataSample){assignSample(S.sport);syncFields();}updateSportUI();schedule();scheduleThumbs(true);
+  S.sport=r.value;
+  if(race&&race.esporte&&race.esporte!==S.sport){var rn=race.nome,re=race.esporte;setRace('');toast('Arte da '+rn+' tirada: ela é para '+re);}if(S.dataSample){assignSample(S.sport);syncFields();}updateSportUI();schedule();scheduleThumbs(true);
 });});
 document.querySelectorAll('input[name="sportPick"]').forEach(function(r){r.addEventListener('change',function(){var t=$('sp-'+r.value);if(t&&!t.checked)t.click();});});
 /* football has its own three models; the other sports share the eight */
