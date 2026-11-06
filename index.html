@@ -620,7 +620,7 @@ button.lg[aria-pressed="true"] .nlab{color:var(--text)}
         <div class="group">
           <label class="row ind upload" for="shotIn">
             <span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M9 15.5c1.2-3 2.6-1 3.6-3.4.8-1.9 1.6-2.4 2.4-2.4"/><circle cx="9" cy="15.5" r=".9" fill="currentColor"/></svg></span>
-            <span class="grow"><b>Print do Strava</b><small id="shotName">Mapa e números saem do print</small></span>
+            <span class="grow"><b>Imagem do Strava</b><small id="shotName">Mapa e números saem da imagem</small></span>
             <span class="pill" id="shotPill">Carregar</span>
             <input class="vh" type="file" id="shotIn" accept="image/*">
           </label>
@@ -632,7 +632,7 @@ button.lg[aria-pressed="true"] .nlab{color:var(--text)}
           </label>
         </div>
         <p class="error" id="mediaError" hidden></p>
-        <p class="note">Mais fácil: no app do Strava, abra a atividade e tire um print com o mapa e os números aparecendo. O GPX dá o percurso exato: abra a atividade no navegador, toque nos três pontos e escolha Exportar GPX.</p>
+        <p class="note">Mais fácil: no Strava, toque em compartilhar na atividade, escolha a imagem com o percurso e os números e toque em Salvar. Depois carregue aqui. Um print da atividade também serve. O GPX dá o percurso exato: abra a atividade no navegador, toque nos três pontos e escolha Exportar GPX.</p>
       </div>
       <div class="sec" id="notifSec" hidden>
         <div class="sec-head"><span class="eyebrow" id="lbl-notif">Notificação</span><button class="link" id="nAuto" type="button" hidden>Voltar ao texto automático</button></div>
@@ -867,8 +867,8 @@ function metrics(){
   if(ROUTE_SPORTS[S.sport]){
     var run=S.sport==='corrida';
     if(d>0)out.hero={label:'Distância',value:dec(d,run?2:1),unit:'km',long:'QUILÔMETROS'};
-    if(run&&d>0&&t>0)out.stats.push({label:'Ritmo',value:fmtT(t/d),unit:'/km'});
-    if(!run&&d>0&&t>0)out.stats.push({label:'Vel. média',value:dec(d/(t/3600),1),unit:'km/h'});
+    if(run&&d>0&&t>0)out.stats.push({label:'Ritmo',value:fmtT(paceOf(d,t)),unit:'/km'});
+    if(!run&&d>0&&t>0)out.stats.push({label:'Vel. média',value:dec(speedOf(d,t),1),unit:'km/h'});
     if(t>0){var tm={label:'Tempo',value:fmtT(t),unit:''};if(out.hero)out.stats.push(tm);else{tm.long='TEMPO';out.hero=tm;}}
     if(e>0)out.stats.push({label:'Elevação',value:String(Math.round(e)),unit:'m'});
   }else{
@@ -877,6 +877,9 @@ function metrics(){
   }
   return out;
 }
+// pace and speed as the Strava image showed them (it rounds from the exact distance), until distance or time is edited
+function paceOf(d,t){var f=S.fix;return f&&f.pace&&f.d===S.dist&&f.t===S.time?f.pace:t/d;}
+function speedOf(d,t){var f=S.fix;return f&&f.speed&&f.d===S.dist&&f.t===S.time?f.speed:d/(t/3600);}
 function hasRoute(){return !!(ROUTE_SPORTS[S.sport]&&S.showMap&&S.route&&S.route.length>1);}
 
 /* ---------- canvas helpers ---------- */
@@ -1807,7 +1810,7 @@ function notifAuto(){
   }
   if(sp==='corrida'||sp==='ciclismo'){
     var run=sp==='corrida',km=d?dec(d,run?2:1):'',what=run?'Treino':'Pedal';
-    var tail=run?(d&&t?', ritmo de '+fmtT(t/d)+'/km':''):(d&&t?', média de '+dec(d/(t/3600),1)+' km/h':'');
+    var tail=run?(d&&t?', ritmo de '+fmtT(paceOf(d,t))+'/km':''):(d&&t?', média de '+dec(speedOf(d,t),1)+' km/h':'');
     var el=e>0?' e '+e+' m de '+(run?'elevação':'subida'):'';
     return {title:what+' concluído'+(km?' · '+km+' km':time?' · '+time:''),body:(T||what)+(time?' em '+time:'')+tail+el+'.'};
   }
@@ -2326,15 +2329,19 @@ function spRoute(img){
   else{polys.forEach(function(p,k){if(p.length>polys[first].length)first=k;});}
   var path=polys.splice(first,1)[0];if(flip)path.reverse();
   var span0=Math.max(bw2,bh2),dirOf=function(P,fromEnd){var n=P.length,a=fromEnd?P[Math.max(0,n-4)]:P[Math.min(n-1,3)],b=fromEnd?P[n-1]:P[0],l=dist(a,b)||1;return fromEnd?[(b[0]-a[0])/l,(b[1]-a[1])/l]:[(a[0]-b[0])/l,(a[1]-b[1])/l];};
+  // grow the chain at its end, and also at its start when no green dot fixed where the route begins
   while(polys.length){
-    var e=path[path.length-1],dv=dirOf(path,true),best=null;
-    polys.forEach(function(p,k){[false,true].forEach(function(rev){var s0=rev?p[p.length-1]:p[0],gv=[s0[0]-e[0],s0[1]-e[1]],d=Math.hypot(gv[0],gv[1]);
-      var al=d<cs*1.5?1:(dv[0]*gv[0]+dv[1]*gv[1])/d,pd=dirOf(rev?p.slice().reverse():p,false),al2=dv[0]*pd[0]+dv[1]*pd[1];
-      var cost=d*(1.6-al)+d*0.4*(1-al2)+(al2<-0.3?span0*0.2:0);if(!best||cost<best.cost)best={k:k,rev:rev,d:d,cost:cost};});});
+    var best=null;
+    [true,false].forEach(function(atEnd){if(!atEnd&&gc)return;
+      var rp=atEnd?path:path.slice().reverse(),e=rp[rp.length-1],dv=dirOf(rp,true);
+      polys.forEach(function(p,k){[false,true].forEach(function(rev){var s0=rev?p[p.length-1]:p[0],gv=[s0[0]-e[0],s0[1]-e[1]],d=Math.hypot(gv[0],gv[1]);
+        var al=d<cs*1.5?1:(dv[0]*gv[0]+dv[1]*gv[1])/d,pd=dirOf(rev?p.slice().reverse():p,false),al2=dv[0]*pd[0]+dv[1]*pd[1];
+        var cost=d*(1.6-al)+d*0.4*(1-al2)+(al2<-0.3?span0*0.2:0);if(!best||cost<best.cost)best={k:k,rev:rev,d:d,cost:cost,atEnd:atEnd};});});});
     if(!best||best.d>span0*0.6)break;
     var nxt=polys.splice(best.k,1)[0];if(best.rev)nxt.reverse();
-    var s1=nxt[0],steps=Math.floor(best.d/3);for(var s3=1;s3<steps;s3++)path.push([e[0]+(s1[0]-e[0])*s3/steps,e[1]+(s1[1]-e[1])*s3/steps]);
-    path=path.concat(nxt);
+    var base2=best.atEnd?path:path.slice().reverse(),e2=base2[base2.length-1],s1=nxt[0],steps=Math.floor(best.d/3);
+    for(var s3=1;s3<steps;s3++)base2.push([e2[0]+(s1[0]-e2[0])*s3/steps,e2[1]+(s1[1]-e2[1])*s3/steps]);
+    base2=base2.concat(nxt);path=best.atEnd?base2:base2.reverse();
   }
   // a loop: the start marker hides the last bit of line, so close it
   if(gc&&path.length>20&&dist(path[path.length-1],path[0])<span0*0.15)path.push(path[0].slice());
@@ -2375,10 +2382,13 @@ function spToRoute(pts,km){
 
 /* --- reading the numbers --- */
 function spOCRImage(img){
-  var A=spCanvas(img,1240),W=A.c.width,H=A.c.height,id=A.x.getImageData(0,0,W,H),d=id.data,sum=0,i;
+  // transparent PNGs (the Strava sticker: white text on nothing) go on black first, so they read as dark mode
+  var A=spCanvas(img,1240),W=A.c.width,H=A.c.height;
+  A.x.globalCompositeOperation='destination-over';A.x.fillStyle='#000';A.x.fillRect(0,0,W,H);A.x.globalCompositeOperation='source-over';
+  var id=A.x.getImageData(0,0,W,H),d=id.data,sum=0,i;
   for(i=0;i<d.length;i+=16)sum+=d[i]*0.3+d[i+1]*0.59+d[i+2]*0.11;
   var dark=sum/(d.length/16)<110;
-  for(i=0;i<d.length;i+=4){var l=d[i]*0.3+d[i+1]*0.59+d[i+2]*0.11;if(dark)l=255-l;d[i]=d[i+1]=d[i+2]=l;}
+  for(i=0;i<d.length;i+=4){var l=d[i]*0.3+d[i+1]*0.59+d[i+2]*0.11;if(dark)l=255-l;d[i]=d[i+1]=d[i+2]=l;d[i+3]=255;}
   A.x.putImageData(id,0,0);return A.c;
 }
 function spWords(data){
@@ -2431,7 +2441,7 @@ function spLabels(lines){
   var out=[];
   lines.forEach(function(L){var ws=L.ws;
     ws.forEach(function(w,i){var a=w.t.toLowerCase(),b=(ws[i+1]&&ws[i+1].t.toLowerCase())||'',c=(ws[i+2]&&ws[i+2].t.toLowerCase())||'';
-      var add=function(type,prio){out.push({type:type,prio:prio,x:w.x,y:w.y,h:L.h,line:L});};
+      var add=function(type,prio){out.push({type:type,prio:prio,x:w.x,y:w.y,w:w.w,h:L.h,line:L});};
       if(/^dist[âa]nc|^distance/.test(a))add('dist',2);
       else if(/^ritmo|^pace/.test(a))add('pace',2);
       else if(/^velocidade|^speed/.test(a))add('speed',2);
@@ -2452,7 +2462,8 @@ function spParse(words,imgW){
   var cells=[];lines.forEach(function(L){L.cells.forEach(function(c){c.L=L;cells.push(c);});});
   labels.forEach(function(lb){
     var best=null,bd=1e9;
-    cells.forEach(function(c){if(c.y<=lb.y+lb.h*0.4||c.y>lb.y+lb.h*5)return;if(Math.abs(c.x-lb.x)>tol)return;
+    // same column: left edges line up (grids) or the two overlap (centred stacks, like the Strava sticker)
+    cells.forEach(function(c){if(c.y<=lb.y+lb.h*0.4||c.y>lb.y+lb.h*5)return;var ov=Math.min(lb.x+lb.w,c.x+c.w)-Math.max(lb.x,c.x);if(Math.abs(c.x-lb.x)>tol&&ov<lb.w*0.5)return;
       var v=spVal(lb.type,c.t);if(v==null)return;var dd=(c.y-lb.y)+Math.abs(c.x-lb.x)*0.5;if(dd<bd){bd=dd;best=v;}});
     if(best!=null&&(prio[lb.type]==null||lb.prio>prio[lb.type])){res[lb.type]=best;prio[lb.type]=lb.prio;}
   });
@@ -2471,7 +2482,8 @@ function spParse(words,imgW){
     if(d&&!isNaN(d)){res.date=d;dateLine=L;return true;}return false;});
   // title: the big line right under the date (or the biggest line above the numbers)
   var top=labels.length?Math.min.apply(null,labels.map(function(l){return l.y;})):Infinity;
-  var cand=lines.filter(function(L){return L!==dateLine&&L.cy<top&&(!dateLine||L.cy>dateLine.cy)&&/[a-zà-ú]{3}/i.test(L.t)&&!/\d+\s?(km|m|\/km)\b/i.test(L.t);});
+  var conf=function(L){return L.ws.reduce(function(a,w){return a+w.c;},0)/L.ws.length;};
+  var cand=lines.filter(function(L){return L!==dateLine&&L.cy<top&&(!dateLine||L.cy>dateLine.cy)&&/[a-zà-ú]{4}/i.test(L.t)&&L.t.length>=5&&conf(L)>=70&&!/parciais|flyover|compartilh|curtida|kudos|coment|strava/i.test(L.t)&&!/\d+\s?(km|m|\/km)\b/i.test(L.t);});
   if(dateLine)cand=cand.filter(function(L){return L.h>dateLine.h*1.25;});
   if(cand.length){cand.sort(function(a,b){return dateLine?(a.cy-b.cy):(b.h-a.h);});var tt=cand[0].t.replace(/^[^A-Za-zÀ-ú0-9]+|[^A-Za-zÀ-ú0-9!?.]+$/g,'').trim();if(tt.length>=3)res.title=tt;}
   var all=lines.map(function(L){return L.t;}).join(' ').toLowerCase();
@@ -2545,14 +2557,14 @@ var TAGS={corrida:'#corridaderua #corrida #treino',ciclismo:'#ciclismo #pedal #b
 function captions(){
   var d=num(S.dist),t=secs(S.time),e=Math.round(num(S.elev)),T=S.title.trim()||'Treino feito',time=t?fmtT(t):'',det=S.detail.trim(),out;
   if(S.sport==='corrida'){
-    var km=d?dec(d,2).replace(/,00$/,''):'',pace=d&&t?fmtT(t/d):'';
+    var km=d?dec(d,2).replace(/,00$/,''):'',pace=d&&t?fmtT(paceOf(d,t)):'';
     out=[
       km&&pace?km+' km no relógio e '+pace+'/km no pé. Missão cumprida.':T+'. Missão cumprida.',
       km&&time?T+': '+km+' km em '+time+'. Quem vem no próximo?':T+'. Quem vem no próximo?',
       'Um passo de cada vez'+(km?', '+km+' km de cada vez':'')+'.'
     ];
   }else if(S.sport==='ciclismo'){
-    var kmc=d?dec(d,1).replace(/,0$/,''):'',vel=d&&t?dec(d/(t/3600),1):'';
+    var kmc=d?dec(d,1).replace(/,0$/,''):'',vel=d&&t?dec(speedOf(d,t),1):'';
     out=[
       kmc&&vel?kmc+' km de pedal a '+vel+' km/h de média.'+(e?' '+e+' m de subida para contar história.':''):T+'. Pedal feito.',
       time?T+': '+time+' em cima da bike.':T+'.',
@@ -3519,7 +3531,7 @@ $('gpxIn').addEventListener('change',function(){
 var shotBusy=false;
 $('shotIn').addEventListener('change',function(){
   var f=this.files&&this.files[0];this.value='';if(!f||shotBusy)return;
-  shotBusy=true;$('shotPill').textContent='Lendo…';showError('');toast('Lendo o print… na primeira vez leva alguns segundos');
+  shotBusy=true;$('shotPill').textContent='Lendo…';showError('');toast('Lendo a imagem… na primeira vez leva alguns segundos');
   var url=URL.createObjectURL(f),img=new Image();
   var finish=function(){URL.revokeObjectURL(url);shotBusy=false;$('shotPill').textContent='Carregar';};
   img.onerror=function(){finish();showError('Não consegui abrir essa imagem. Tente outro print.');};
@@ -3532,20 +3544,23 @@ $('shotIn').addEventListener('change',function(){
         if(rd.dist!=null){S.dist=dec(rd.dist,S.sport==='corrida'?2:1);got.push(S.dist+' km');}
         if(rd.time!=null){S.time=fmtT(rd.time);got.push(S.time);}
         if(rd.elev!=null)S.elev=String(rd.elev);else if(got.length&&S.dataSample)S.elev='';
-        if(rd.date)S.date=fmtDate(rd.date);
+        if(rd.date)S.date=fmtDate(rd.date);else if(got.length&&S.dataSample)S.date=fmtDate(new Date());
         if(rd.title)S.title=rd.title.slice(0,40);
+        else if(got.length&&S.dataSample){var hr=new Date().getHours(),bike=S.sport==='ciclismo',w=bike?'Pedal':'Corrida';
+          S.title=w+(hr<11?(bike?' matinal':' matinal'):hr<14?' na hora do almoço':hr<17?' à tarde':hr<20?' ao entardecer':(bike?' noturno':' noturna'));}
+        S.fix=(rd.pace||rd.speed)&&S.dist&&S.time?{d:S.dist,t:S.time,pace:rd.pace||null,speed:rd.speed||null}:null;
       }
       if(R.ok){
         if(!ROUTE_SPORTS[S.sport]){S.sport='corrida';$('sp-corrida').checked=true;}
         S.route=spToRoute(R.pts,rd&&rd.dist||0);routeVer++;S.routeSample=false;S.showMap=true;$('showMap').checked=true;
       }
       if(!R.ok&&!got.length){
-        showError(ocrFailed?'Não consegui ler esse print agora. Confira a internet e tente de novo, ou use o GPX.':'Não achei o mapa nem os números nesse print. Use o print da tela da atividade no Strava, com o mapa e os números aparecendo.');return;}
+        showError(ocrFailed?'Não consegui ler essa imagem agora. Confira a internet e tente de novo, ou use o GPX.':'Não achei o mapa nem os números nessa imagem. Use a imagem que o Strava salva ao compartilhar, ou um print da atividade com o mapa e os números aparecendo.');return;}
       if(got.length)S.dataSample=false;
-      syncFields();updateSportUI();$('shotName').textContent=R.ok&&got.length?'Percurso e números do print':R.ok?'Percurso do print':'Números do print';if(R.ok)$('gpxName').textContent='Percurso do print';schedule();
-      if(R.ok&&got.length)toast('Print lido: '+got.join(' · ')+'. Confira os números');
+      syncFields();updateSportUI();$('shotName').textContent=R.ok&&got.length?'Percurso e números da imagem':R.ok?'Percurso da imagem':'Números da imagem';if(R.ok)$('gpxName').textContent='Percurso da imagem';schedule();
+      if(R.ok&&got.length)toast('Imagem lida: '+got.join(' · ')+'. Confira os números');
       else if(R.ok)toast(ocrFailed?'Percurso lido. Os números não carregaram: preencha abaixo':'Percurso lido. Não achei os números: preencha abaixo');
-      else toast('Li os números, mas não achei o mapa no print');
+      else toast('Li os números, mas não achei o mapa na imagem');
     };
     var timer=new Promise(function(ok,no){setTimeout(function(){no(new Error('tempo'));},45000);});
     Promise.race([spReadText(img),timer]).then(function(r){var rd=null;try{rd=spParse(r.words,r.W);}catch(e){}apply(rd,false);},function(){apply(null,true);});
