@@ -12,6 +12,7 @@ Atletas de corrida, ciclismo, HYROX, CrossFit e futebol. Organizadores de corrid
 
 ## Funções principais
 - Mapa do percurso a partir do arquivo GPX do Strava/Garmin, com 6 estilos (Linha, Radar, Carta antiga, Metrô, Navegação, 8-bit).
+- Imagem do Strava (a figurinha salva ao compartilhar, a das parciais, um print): a pessoa escolhe entre **Arte do Strava** (a imagem inteira vira o modelo "Arte do Strava", sem o fundo vazio, com a logo e a arte da corrida; com o recorte, fica atrás do atleta), **Dados e mapa** (o app lê o percurso e os números e monta no modelo escolhido) ou **Os dois** (a arte por cima do modelo, no espaço mais livre). A escolha fica guardada no aparelho. Se a imagem não tiver mapa nem números legíveis, ela entra como arte.
 - Números do treino: distância, tempo, ritmo, elevação e data (preenchidos pelo GPX ou à mão).
 - Todos os itens podem ser movidos, aumentados e girados com os dedos.
 - Foto: zoom, escurecer, degradê de baixo para cima (cor, intensidade, início e fim).
