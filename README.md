@@ -23,7 +23,7 @@ Atletas de corrida, ciclismo, HYROX, CrossFit e futebol. Organizadores de corrid
 - Pacote da corrida: logo da corrida, faixa de patrocinadores, moldura oficial (story e feed), nome, data, distâncias, cor, hashtag e @ nas legendas.
 - Cada corrida tem link próprio (/c/nome-da-corrida) e pode aparecer na lista de corridas parceiras.
 - Futebol: nome e cor dos times, placar e tempo de jogo, em 3 modelos (TV, Telão e Gigante).
-- Adesivos holográficos (aba Adesivo): Eu vou / Eu fui / Tô dentro (no adesivo redondo holográfico do Bruno, com data, distância e o nome da corrida parceira na borda), Tá pago, 10 km, 5 km e 3 km (a distância da prova recortada como adesivo, inclinada, com a etiqueta KM), Ritmo (ingresso com o tempo no canhoto) e Recorde (PR). Os números saem do treino, o canto fica descolando e eles ficam na frente do atleta, movidos e girados com os dedos.
+- Adesivos holográficos (aba Adesivo): Eu vou / Eu fui / Tô dentro (no adesivo redondo holográfico do Bruno, com data e o nome da corrida parceira na borda), Tá pago, 10 km, 5 km e 3 km (a distância da prova recortada como adesivo, inclinada, com a etiqueta KM), Ritmo (ingresso com o tempo no canhoto) e Recorde (PR). O km embaixo do Eu vou e do Recorde é digitado pela pessoa na aba (vazio = sem km); o canto fica descolando e eles ficam na frente do atleta, movidos e girados com os dedos.
 - Legendas prontas, sugestões de música e dicas de pose.
 
 ## Corridas parceiras

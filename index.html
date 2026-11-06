@@ -769,7 +769,14 @@ button.lg[aria-pressed="true"] .nlab{color:var(--text)}
       <div class="sec">
         <div class="sec-head"><span class="eyebrow" id="lbl-stk">Adesivos holográficos</span></div>
         <div class="stkgrid" id="stkGrid" role="group" aria-labelledby="lbl-stk"></div>
-        <p class="note">Toque para colocar na foto ou tirar. Os números saem do seu treino. Na foto, arraste, aumente e gire com os dedos: eles ficam na frente de tudo, como um adesivo de verdade.</p>
+        <p class="note">Toque para colocar na foto ou tirar. Na foto, arraste, aumente e gire com os dedos: eles ficam na frente de tudo, como um adesivo de verdade.</p>
+      </div>
+      <div class="sec">
+        <div class="sec-head"><span class="eyebrow" id="lbl-stkkm">Km nos adesivos</span></div>
+        <div class="group">
+          <label class="row field" for="stkKm"><span class="fl">Distância</span><input id="stkKm" class="num" type="text" inputmode="decimal" maxlength="6" placeholder="Sem km" autocomplete="off"><span class="unit">km</span></label>
+        </div>
+        <p class="note">Aparece embaixo no Eu vou e no Recorde. Deixe vazio para não mostrar km.</p>
       </div>
       <div class="sec">
         <div class="sec-head"><span class="eyebrow" id="lbl-frase">Frase do adesivo redondo</span></div>
@@ -872,7 +879,7 @@ var STYLE_DESC={
   retro:'Mapa de fase de jogo antigo, com um nível a cada quilômetro.'
 };
 
-var S={sport:'corrida',template:'percurso',mapStyle:'linha',pixel:true,showData:true,showLogo:true,quality:'max',cutOn:false,cutErase:false,cutSize:64,cutEdge:0,font:'padrao',logoVar:'full-branco',raceLogo:true,raceSpons:true,raceFrame:true,showExtra:false,notif:{app:'Pódio',icon:'podio',glass:'escuro',title:null,body:null},extraWhite:false,grad:{on:false,color:'#000000',alpha:80,start:0,end:45},tf:{},hidden:{},sel:null,mapWas:null,art:null,artOver:false,tplWas:null,stk:{},stkPhrase:'EU VOU',format:'story',accent:'#E9B949',darken:0,zoom:100,ox:0,oy:0,
+var S={sport:'corrida',template:'percurso',mapStyle:'linha',pixel:true,showData:true,showLogo:true,quality:'max',cutOn:false,cutErase:false,cutSize:64,cutEdge:0,font:'padrao',logoVar:'full-branco',raceLogo:true,raceSpons:true,raceFrame:true,showExtra:false,notif:{app:'Pódio',icon:'podio',glass:'escuro',title:null,body:null},extraWhite:false,grad:{on:false,color:'#000000',alpha:80,start:0,end:45},tf:{},hidden:{},sel:null,mapWas:null,art:null,artOver:false,tplWas:null,stk:{},stkPhrase:'EU VOU',stkKm:'',format:'story',accent:'#E9B949',darken:0,zoom:100,ox:0,oy:0,
   showMap:true,sign:true,guides:true,photo:null,photoSample:true,route:null,routeSample:true,dataSample:true,
   title:'',date:fmtDate(new Date()),dist:'',time:'',elev:'',detail:'',match:null};
 S.match=sampleMatch();
@@ -1935,11 +1942,12 @@ function stkAssets(){
   });
 }
 function stkLabel(id){return STK_NAME[id];}
+/* the km on the stickers is the one the athlete types in the Adesivo tab: empty, no km at all */
+function stkKmText(){var t=String(S.stkKm||'').replace(/\./g,',').replace(/[^0-9,]/g,'').replace(/^0+(?=\d)/,'').replace(/,+$/,'');return t&&num(t)>0?t:'';}
 function stkData(){
-  var m=metrics(),d=num(S.dist),route=!!ROUTE_SPORTS[S.sport],km='';
-  if(route&&d>0)km=Math.abs(d-42.195)<0.3?'42K':Math.abs(d-21.0975)<0.25?'21K':Math.abs(d-Math.round(d))<0.15?Math.round(d)+'K':dec(d,1)+'K';
+  var m=metrics(),km=stkKmText();
   var date=race&&race.data?isoToField(race.data):S.date;
-  return {m:m,km:km,date:String(date||'').toUpperCase(),sport:SPORT_NAME[S.sport]||'',race:race?String(race.nome||race.titulo||'').toUpperCase():''};
+  return {m:m,km:km?km+'K':'',kmFull:km?km+' KM':'',date:String(date||'').toUpperCase(),sport:SPORT_NAME[S.sport]||'',race:race?String(race.nome||race.titulo||'').toUpperCase():''};
 }
 /* an offscreen layer as sharp as the place it will be drawn */
 function stkLayer(w,h){var k=clamp(SHK,0.2,3),c=document.createElement('canvas');c.width=Math.max(1,Math.ceil(w*k));c.height=Math.max(1,Math.ceil(h*k));var g=c.getContext('2d');g.scale(c.width/w,c.height/h);g.fillStyle='#000';return {c:c,g:g};}
@@ -2031,12 +2039,12 @@ function stkFit(g,text,mk,max,maxW){var s=max;g.font=mk(s);while(s>20&&g.measure
 
 /* Eu vou: Bruno's own round holographic sticker, with the phrase, the date and the distance printed on it */
 function stkEuVouInk(g,d){   /* drawn in the 1254 px space of the original sticker */
-  var P=S.stkPhrase||'EU VOU',cx=620,cy=640;
+  var P=S.stkPhrase||'EU VOU',cx=620,cy=d.km?640:676;
   g.fillStyle=STK_INK;
   ls(g,8);g.font=F.mono(500,38);g.textAlign='center';g.fillText(d.date,cx,cy-182);ls(g,0);
   var s=stkFit(g,P,function(z){return F.disp(900,z);},330,780);
   g.font=F.disp(900,s);g.fillText(P,cx,cy+s*0.36);
-  stkPill(g,d.km||d.sport,cx,cy+s*0.36+92,F.disp(900,72),96,42,STK_INK);
+  if(d.km)stkPill(g,d.km,cx,cy+s*0.36+92,F.disp(900,72),96,42,STK_INK);
   stkArc(g,d.race||STK_SUB[P]||'',627,610,488,Math.PI/2,F.disp(800,46),STK_INK,true,6);
   g.fillStyle=STK_INK;stkSpark(g,292,462,28);stkSpark(g,346,420,13);stkSpark(g,968,806,22);
   g.textAlign='left';
@@ -2116,13 +2124,13 @@ function stkRitmo(ctx,w,h){
 }
 /* Recorde: a starburst in red ink */
 function stkPR(ctx,w,h){
-  var d=stkData(),m=d.m,v=m.hero?m.hero.value+(m.hero.unit?' '+m.hero.unit.toUpperCase():''):d.date;
+  var d=stkData(),v=d.kmFull;
   stkDraw(ctx,w,h,{mask:stkStar(18,0.86),ang:-1.1,peel:['tl',w*0.045],ink:function(g){
     var cx=w/2,cy=h/2;
     stkArc(g,'RECORDE PESSOAL',cx,cy,w*0.355,-Math.PI/2,F.disp(800,w*0.072),STK_RED,false,w*0.008);
-    g.fillStyle=STK_RED;var ps=stkFit(g,'PR',function(z){return F.disp(900,z);},w*0.4,w*0.5);g.font=F.disp(900,ps);g.textAlign='center';g.fillText('PR',cx,cy+w*0.12);g.textAlign='left';
-    g.font=F.disp(900,w*0.075);var vs=w*0.075;while(vs>14&&g.measureText(v).width>w*0.42){vs-=2;g.font=F.disp(900,vs);}
-    stkPill(g,v,cx,cy+w*0.25,F.disp(900,vs),w*0.11,w*0.045,STK_RED);
+    g.fillStyle=STK_RED;var ps=stkFit(g,'PR',function(z){return F.disp(900,z);},w*0.4,w*0.5);g.font=F.disp(900,ps);g.textAlign='center';g.fillText('PR',cx,cy+(v?w*0.12:w*0.16));g.textAlign='left';
+    if(v){g.font=F.disp(900,w*0.075);var vs=w*0.075;while(vs>14&&g.measureText(v).width>w*0.42){vs-=2;g.font=F.disp(900,vs);}
+      stkPill(g,v,cx,cy+w*0.25,F.disp(900,vs),w*0.11,w*0.045,STK_RED);}
     g.fillStyle=STK_RED;stkSpark(g,cx-w*0.31,cy-w*0.02,w*0.04);stkSpark(g,cx+w*0.31,cy-w*0.02,w*0.04);
   }});
 }
@@ -2170,9 +2178,11 @@ function buildStkGrid(){
     if(!S.stk.euvou){S.stk.euvou=true;S.sel='stk-euvou';updateSelTool();}syncStkUI();schedule();});});
   syncStkUI();
 }
+$('stkKm').addEventListener('input',function(){S.stkKm=this.value;schedule();});
 function syncStkUI(){
   document.querySelectorAll('#stkGrid .stk').forEach(function(l){var inp=l.querySelector('input'),id=inp.value;inp.checked=!!S.stk[id];l.querySelector('.s-name').textContent=stkLabel(id);});
   STK_PHRASES.forEach(function(p,i){var r=$('sp-frase-'+i);if(r)r.checked=S.stkPhrase===p;});
+  if($('stkKm').value!==S.stkKm)$('stkKm').value=S.stkKm;
 }
 function renderStkThumbs(){
   if(screen!=='editor'||$('pane-adesivos').hidden)return;
@@ -2456,7 +2466,7 @@ function tfFor(it,pre){var t=S.tf[pre+it.id];return t?t:{x:it.cx,y:it.cy,s:1,r:i
 
 /* ---------- each sticker is cached as its own image, then placed with move / scale / rotate ---------- */
 var elCache={},fontsVer=0,scalingId=null,gestTarget=null;
-function contentKey(){return [artVer,stkVer,S.stkPhrase,S.title,S.date,S.dist,S.time,S.elev,S.detail,S.sport,S.accent,S.mapStyle,routeVer,logoVer,S.logoVar,raceVer,race?race.id:'',S.extraWhite,S.format,fontsVer,S.font,S.sport==='futebol'?JSON.stringify(S.match):'',S.template==='notif'?JSON.stringify(S.notif)+nIconVer+(hasRoute()?1:0):''].join('|');}
+function contentKey(){return [artVer,stkVer,S.stkPhrase,S.stkKm,S.title,S.date,S.dist,S.time,S.elev,S.detail,S.sport,S.accent,S.mapStyle,routeVer,logoVer,S.logoVar,raceVer,race?race.id:'',S.extraWhite,S.format,fontsVer,S.font,S.sport==='futebol'?JSON.stringify(S.match):'',S.template==='notif'?JSON.stringify(S.notif)+nIconVer+(hasRoute()?1:0):''].join('|');}
 function drawElLocal(ctx,it,style){resetText(ctx);if(it.kind==='map')WIDGETS[it.style](ctx,it.w,it.h);else DRAW[it.kind](ctx,it,metrics(),style);resetText(ctx);}
 function elImage(it,s,stale){
   var key=it.kind+'|'+(it.variant||'')+'|'+Math.round(it.w)+'|'+Math.round(it.h)+'|'+(it.style||'')+'|'+contentKey(),c=elCache[it.id];
